@@ -1,5 +1,5 @@
 # eu-aiv-analysis
-Spatiotemporal analysis of avian influenza risk in Europe using R
+Spatiotemporal analysis of avian influenza risk in Europe using Python and R
 
 This research investigates the spatial distribution and environmental drivers of avian influenza (AIV) risk in Europe by integrating multiple open-source datasets, including bird observation records from eBird, outbreak reports from FAO, and satellite-derived environmental variables from Google Earth Engine (GEE).
 
