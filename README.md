@@ -10,6 +10,10 @@ CLI-based workflow for:
 
 The project has been reorganized so the main analyses can be run from the terminal without editing paths in the original scripts.
 
+## Example Dashboard
+
+![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
+
 ## Important Path Rule
 
 You may rename the repository folder after cloning or downloading it.
