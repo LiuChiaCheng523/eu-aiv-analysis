@@ -357,9 +357,13 @@ aiv_analysis/
       └─ weighted_abundance/
 ```
 
-## Example Land Cover Feature Importance Radar Chart
+## Example Gam Model Abundance Effect And P-value Bar Chart
 
 ![Plotly Dashboard example](docs/abundance_effect_pvalue_plot.png)
+
+## Example Vanellus vanellus stage2 weighted abundance distribution
+
+![Plotly Dashboard example](docs/stage2_plot.png)
 
 ## 4. Land Cover Imputation CLI
 
