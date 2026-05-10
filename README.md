@@ -258,6 +258,10 @@ All species:
 Rscript ".\run_validation_and_prediction_summary.R" --all-species
 ```
 
+## Example Validation SRC Performance
+
+![Plotly Dashboard example](docs/Validation_SRC_Performance_example.png)
+
 ### Main arguments
 
 - `--species`
