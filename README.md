@@ -287,6 +287,10 @@ Rscript ".\run_validation_and_prediction_summary.R" --all-species
 
 ![Plotly Dashboard example](docs/Validation_SRC_Performance_example.png)
 
+## Example Land Cover Feature Importance Radar Chart
+
+![Plotly Dashboard example](docs/Land_Cover_FI_Radar_Chart_example.png)
+
 ## 3. AIV Analysis CLI
 
 Script:
