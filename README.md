@@ -258,10 +258,6 @@ All species:
 Rscript ".\run_validation_and_prediction_summary.R" --all-species
 ```
 
-## Example Validation SRC Performance
-
-![Plotly Dashboard example](docs/Validation_SRC_Performance_example.png)
-
 ### Main arguments
 
 - `--species`
@@ -286,6 +282,10 @@ Rscript ".\run_validation_and_prediction_summary.R" --all-species
 - `validation_prediction_summary/plots/validation_summary_scatter.png`
 - `validation_prediction_summary/plots/feature_importance_land_cover_radar.png`
 - `validation_prediction_summary/plots/species_maps/...`
+
+## Example Validation SRC Performance
+
+![Plotly Dashboard example](docs/Validation_SRC_Performance_example.png)
 
 ## 3. AIV Analysis CLI
 
