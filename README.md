@@ -44,6 +44,20 @@ bird_project_2026/
 
 This works because the script uses its own file location as the base directory.
 
+## Data Download
+
+Large data files are not stored directly in this GitHub repository because of GitHub file size limits.
+
+Download the required data from Google Drive:
+
+[Google Drive folder](https://drive.google.com/drive/folders/1YX5561Yos3P4PsK1OfChdaQ7mAzx2Ihm)
+
+After downloading:
+
+1. Extract the zip files.
+2. Place the extracted folders under the project root.
+3. Keep the internal relative folder structure unchanged.
+
 ## Project Structure
 
 ```text
