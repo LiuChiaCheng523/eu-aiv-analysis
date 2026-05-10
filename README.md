@@ -1,4 +1,4 @@
-# abundance_r_test
+# eu-aiv-analysis
 
 CLI-based workflow for:
 
