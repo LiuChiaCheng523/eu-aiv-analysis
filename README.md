@@ -357,6 +357,10 @@ aiv_analysis/
       └─ weighted_abundance/
 ```
 
+## Example Land Cover Feature Importance Radar Chart
+
+![Plotly Dashboard example](docs/abundance_effect_pvalue_plot.png)
+
 ## 4. Land Cover Imputation CLI
 
 Script:
