@@ -61,7 +61,7 @@ After downloading:
 ## Project Structure
 
 ```text
-abundance_r_test/
+eu-aiv-analysis/
 ├─ run_abundance_prediction.R
 ├─ run_validation_and_prediction_summary.R
 ├─ run_aiv_analysis.R
