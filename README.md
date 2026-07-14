@@ -154,11 +154,11 @@ The overall results reproduce broad migratory bird movement patterns, with birds
 
 # CLI-based workflow
 
-1. [Bird abundance model training and prediction](#1-abundance-prediction-cli)
-2. [Validation / ensemble post-processing](#2-validation--prediction-summary-cli)
-3. [AIV analysis](#3-aiv-analysis-cli)
-4. [Land-cover imputation](#4-land-cover-imputation-cli)
-5. [Interactive Plotly dashboard](#5-plotly-dashboard)
+1. Bird abundance model training and prediction
+2. Validation / ensemble post-processing
+3. AIV analysis
+4. Land-cover imputation
+5. Interactive Plotly dashboard
 
 ## Scripts Download
 
@@ -267,30 +267,21 @@ python -m pip install numpy pandas plotly dash geopandas shapely pyogrio fiona
 
 ## Workflow Overview
 
-The main CLI workflow is:
+The main workflow is:
 
-| Step | CLI | Purpose | Depends on |
-|---|---|---|---|
-| 1 | [`run_abundance_prediction.R`](#1-abundance-prediction-cli) | Train XGBoost Poisson abundance models and export monthly grid-level predictions. | Raw checklist, environmental, land-cover, and grid data |
-| 2 | [`run_validation_and_prediction_summary.R`](#2-validation--prediction-summary-cli) | Combine model iterations, evaluate SRC, export MAD-filtered abundance, and create summary plots. | Step 1 outputs |
-| 3 | [`run_aiv_analysis.R`](#3-aiv-analysis-cli) | Analyze Wild or Domestic AIV outbreak associations using weighted bird abundance. | Step 2 MAD-filtered abundance |
-| 4 | [`Plotly_Dashboard.py`](#5-plotly-dashboard) | Explore bird abundance maps and grid-level monthly trends interactively. | Step 2 MAD-filtered abundance |
+1. `run_abundance_prediction.R`
+   Generate species-level abundance predictions.
+2. `run_validation_and_prediction_summary.R`
+   Combine iterations, compute validation metrics, export MAD-filter abundance, and generate maps.
+3. `run_aiv_analysis.R`
+   Use MAD-filter abundance outputs for Wild / Domestic AIV analysis.
+4. `Plotly_Dashboard.py`
+   Explore abundance results interactively.
 
 The land-cover imputation workflow is independent:
 
-| Workflow | CLI | Purpose |
-|---|---|---|
-| Land-cover imputation | [`run_land_cover_imputation.R`](#4-land-cover-imputation-cli) | Create validation samples, impute missing Dynamic World land-cover values with XGBoost, and aggregate multi-seed predictions. |
-
-## CLI Input / Output Summary
-
-| CLI | Key inputs | Main outputs | Typical command |
-|---|---|---|---|
-| [`run_abundance_prediction.R`](#1-abundance-prediction-cli) | `ebird_filtered_checklist/`, `gee_data/era5_2016_2022/`, `gee_data/land_cover_2016_2022.csv`, `EU_100km_fishnet_simple_by_distance/*.shp` | `abundance_spatiotemporal_sampling_method/`, `validation_data/`, `glmm_performance/` | `Rscript ".\run_abundance_prediction.R" --species "Anas crecca"` |
-| [`run_validation_and_prediction_summary.R`](#2-validation--prediction-summary-cli) | `abundance_spatiotemporal_sampling_method/`, `validation_data/`, `bird_type_lookup.csv` | `validation_prediction_summary/validation_summary.csv`, `validation_prediction_summary/mad_filter_abundance/`, plots | `Rscript ".\run_validation_and_prediction_summary.R" --all-species` |
-| [`run_aiv_analysis.R`](#3-aiv-analysis-cli) | `validation_prediction_summary/mad_filter_abundance/`, `aiv_fixed_data/`, `livestock_density_10km/`, EU grid shapefile | `aiv_analysis/{Wild_or_Domestic}/{YYYYMMDD}/` | `Rscript ".\run_aiv_analysis.R" --outbreak-type Wild --all-species` |
-| [`run_land_cover_imputation.R`](#4-land-cover-imputation-cli) | `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`, EU grid shapefile | `land_cover_imputation/` | `Rscript ".\run_land_cover_imputation.R" --mode all --seed-start 123 --seed-end 124` |
-| [`Plotly_Dashboard.py`](#5-plotly-dashboard) | `validation_prediction_summary/mad_filter_abundance/`, `ebird_filtered_checklist/`, EU grid shapefile | Local Dash app at `http://127.0.0.1:8050` | `python ".\Plotly_Dashboard.py"` |
+1. `run_land_cover_imputation.R`
+   Sampling -> imputation -> aggregate
 
 ## 1. Abundance Prediction CLI
 
@@ -303,36 +294,6 @@ Purpose:
 - Train abundance models for one, many, or all bird species
 - Use checklist, environmental, and land-cover inputs
 - Export model outputs under `abundance_spatiotemporal_sampling_method/`
-
-### Inputs
-
-| Argument | Default path / value | Description |
-|---|---|---|
-| `--species` | Required unless using `--species-file`, `--all-species`, or `--list-species` | Scientific name(s), comma-separated or repeated. |
-| `--species-file` | None | TXT or CSV file containing scientific names. |
-| `--all-species` | Off | Run all species found in `ebird_filtered_checklist/`. |
-| `--eu-shp-path` | `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp` | European 100 km grid shapefile. |
-| `--env-folder` | `gee_data/era5_2016_2022/` | ERA5-Land yearly environmental CSV files. |
-| `--lc-path` | `gee_data/land_cover_2016_2022.csv` | Dynamic World land-cover CSV. |
-| `--checklist-folder` | `ebird_filtered_checklist/` | Species-level filtered eBird checklist CSV files. |
-| `--start-year`, `--end-year` | `2021`, `2022` | Year range used for filtering and prediction. |
-| `--protocol` | `Traveling` | eBird protocol(s), comma-separated. |
-| `--n-iter` | `3` | Number of model iterations. |
-| `--seed` | `123` | Random seed. |
-
-### Outputs
-
-| Output | Location | Description |
-|---|---|---|
-| Observer correction random effects | `glmm_performance/cci_random_effect/{species}.csv` | GLMM observer correction index. |
-| GLMM performance | `glmm_performance/glmm_performance/{species}.csv` | Observer-bias correction model performance. |
-| Validation data | `validation_data/{species}.csv` | Held-out validation records. |
-| Abundance predictions | `abundance_spatiotemporal_sampling_method/abundance_prediction/{species}/abundance_iteration*.csv` | Monthly grid-level abundance predictions by iteration. |
-| Validation predictions | `abundance_spatiotemporal_sampling_method/validation_prediction/{species}/abundance_iteration*.csv` | Iteration-level validation predictions. |
-| Feature importance | `abundance_spatiotemporal_sampling_method/feature_importance/{species}/iteration*.csv` | XGBoost feature importance by iteration. |
-| Model performance | `abundance_spatiotemporal_sampling_method/model_performance/{species}.csv` | Model-level performance summary. |
-
-Model features include ERA5-Land climate variables, Dynamic World land-cover variables, eBird effort variables, geographic coordinates, temporal variables, and the GLMM observer correction index.
 
 ### Help
 
@@ -408,37 +369,6 @@ Purpose:
 
 This script expects outputs from `run_abundance_prediction.R`.
 
-### Inputs
-
-| Argument | Default path / value | Description |
-|---|---|---|
-| `--species` | Required unless using `--species-file`, `--all-species`, or `--list-species` | Scientific name(s), comma-separated or repeated. |
-| `--species-file` | None | TXT or CSV file containing scientific names. |
-| `--all-species` | Off | Process all species under `abundance_prediction/`. |
-| `--abundance-root` | `abundance_spatiotemporal_sampling_method/` | Root folder created by the abundance prediction CLI. |
-| `--validation-folder` | `validation_data/` | Validation data created by the abundance prediction CLI. |
-| `--checklist-folder` | `ebird_filtered_checklist/` | Checklist files used for map summaries. |
-| `--bird-type-csv` | `bird_type_lookup.csv` | Bird type lookup table. |
-| `--eu-shp-path` | `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp` | European 100 km grid shapefile. |
-| `--n-iter` | Auto-detect | Number of iterations to combine. |
-| `--mad-k` | `1.5` | MAD filter multiplier for outlier filtering. |
-| `--map-years` | Auto-detect | Year(s) to map, comma-separated. |
-| `--map-months` | `1,4,7,10` | Month(s) to map, comma-separated. |
-
-### Outputs
-
-| Output | Location | Description |
-|---|---|---|
-| Validation summary | `validation_prediction_summary/validation_summary.csv` | Species-level validation metrics, including SRC. |
-| MAD-filtered abundance | `validation_prediction_summary/mad_filter_abundance/{species}.csv` | Cleaned abundance data used by AIV analysis and dashboard. |
-| Intersected bird type table | `validation_prediction_summary/bird_type_lookup_intersected.csv` | Bird type lookup intersected with processed species. |
-| Land-cover feature importance summary | `validation_prediction_summary/feature_importance_land_cover_summary.csv` | Aggregated feature-importance summary for land-cover variables. |
-| Validation plot | `validation_prediction_summary/plots/validation_summary_scatter.png` | SRC / validation performance summary figure. |
-| Land-cover radar chart | `validation_prediction_summary/plots/feature_importance_land_cover_radar.png` | Land-cover feature-importance radar chart. |
-| Species maps | `validation_prediction_summary/plots/species_maps/{species}/` | Monthly species abundance maps. |
-
-SRC means Spearman Rank Correlation. It evaluates whether predicted relative abundance preserves the ranking of bird abundance across grid cells.
-
 ### Help
 
 ```powershell
@@ -513,34 +443,6 @@ Purpose:
 
 This script expects outputs from `run_validation_and_prediction_summary.R`.
 
-### Inputs
-
-| Argument | Default path / value | Description |
-|---|---|---|
-| `--outbreak-type` | Required | `Wild` or `Domestic`. |
-| `--species` | Required unless using `--species-file`, `--all-species`, or `--list-species` | Scientific name(s), comma-separated or repeated. |
-| `--species-file` | None | TXT or CSV file containing scientific names. |
-| `--all-species` | Off | Process all species available in `mad_filter_abundance/`. |
-| `--eu-shp-path` | `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp` | European 100 km grid shapefile. |
-| `--chicken-density-path` | `livestock_density_10km/chicken livestock density 10km.csv` | Chicken density covariate. |
-| `--duck-density-path` | `livestock_density_10km/duck livestock density_2015_10km.csv` | Duck density covariate. |
-| `--aiv-2021-path` | `aiv_fixed_data/EU aiv fixed data 2021.csv` | 2021 AIV outbreak records. |
-| `--aiv-2022-path` | `aiv_fixed_data/EU aiv fixed data 2022.csv` | 2022 AIV outbreak records. |
-| `--bird-abundance-folder` | `validation_prediction_summary/mad_filter_abundance/` | MAD-filtered abundance CSV files from the validation CLI. |
-| `--write-date` | Current date as `YYYYMMDD` | Date tag for output folder and CSV names. |
-
-### Outputs
-
-| Output | Location | Description |
-|---|---|---|
-| GAM stage results | `aiv_analysis/{type}/{date}/{type}_all_birds_all_stages_stage_{date}.csv` | Stage-specific abundance effect estimates. |
-| GAM density results | `aiv_analysis/{type}/{date}/{type}_all_birds_all_stages_density_{date}.csv` | Chicken and duck density effects. |
-| Stage-abundance interaction results | `aiv_analysis/{type}/{date}/{type}_all_birds_all_stages_stageabundance_{date}.csv` | Stage by abundance interaction output. |
-| Single-stage abundance results | `aiv_analysis/{type}/{date}/{type}_all_birds_single_stage_abundance_{date}.csv` | Per-stage abundance model output. |
-| Single-stage density results | `aiv_analysis/{type}/{date}/{type}_all_birds_single_stage_density_{date}.csv` | Per-stage poultry density model output. |
-| Overview maps | `aiv_analysis/{type}/{date}/overview_maps/` | Chicken density, duck density, outbreak map, and monthly outbreak distribution plots. |
-| Weighted abundance maps | `aiv_analysis/{type}/{date}/weighted_abundance/{species}/stage*_plot.png` | Stage-level weighted abundance and outbreak maps. |
-
 ### Help
 
 ```powershell
@@ -613,29 +515,6 @@ Purpose:
 - Create interpolation validation samples
 - Run `xgboost` imputation for land-cover types
 - Aggregate multi-seed predictions
-
-### Inputs
-
-| Argument | Default path / value | Description |
-|---|---|---|
-| `--mode` | `all` | One of `sampling`, `imputation`, `aggregate`, or `all`. |
-| `--eu-shp-path` | `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp` | European 100 km grid shapefile. |
-| `--input-csv` | `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv` | Land-cover and climate CSV containing missing values. |
-| `--seed-start` | `123` | First seed number. |
-| `--seed-end` | `222` | Last seed number. |
-| `--n-cores` | `2` | Number of cores for parallel processing. |
-| `--land-cover-types` | All 9 types | Comma-separated land-cover types: `bare`, `built`, `crops`, `flooded_vegetation`, `grass`, `shrub_and_scrub`, `snow_and_ice`, `trees`, `water`. |
-
-### Outputs
-
-| Output | Location | Description |
-|---|---|---|
-| Sampling validation data | `land_cover_imputation/sampling_data/land_cover_seed*.csv` | Seed-level validation samples. |
-| ML prediction output | `land_cover_imputation/ml_prediction_output/` | XGBoost imputation predictions by seed and land-cover type. |
-| Performance comparison | `land_cover_imputation/two_method_performance/seed*.csv` | RMSE and MAE comparison between methods. |
-| Test imputation output | `land_cover_imputation/two_method_test_output/seed*.csv` | Validation-set prediction output. |
-| Final imputed CSV | `land_cover_imputation/final_output/EU_2016_2022_land_cover_imputation_by_xgboost.csv` | Aggregated imputed land-cover data for all selected types. |
-| Single land-cover final CSV | `land_cover_imputation/final_output/{type}/EU_2016_2022_land_cover_imputation_by_xgboost_{type}.csv` | Final output when aggregating only one land-cover type. |
 
 ### Help
 
@@ -713,26 +592,6 @@ Purpose:
 - Explore bird abundance interactively
 - Switch species from a dropdown
 - Click a grid to inspect time series and summary metrics
-
-### Inputs
-
-| Argument | Default path / value | Description |
-|---|---|---|
-| `--eu-shp-path` | `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp` | European 100 km grid shapefile. |
-| `--checklist-folder` | `ebird_filtered_checklist/` | Checklist CSV files used to count grid-level samples. |
-| `--abundance-folder` | `validation_prediction_summary/mad_filter_abundance/` | MAD-filtered abundance CSV files. |
-| `--species` | First available species | Initial species displayed in the dashboard. |
-| `--host` | `127.0.0.1` | Dash host. |
-| `--port` | `8050` | Dash port. |
-| `--debug` | Off | Enable Dash debug mode. |
-
-### Outputs
-
-| Output | Location | Description |
-|---|---|---|
-| Local dashboard server | `http://127.0.0.1:8050` | Interactive browser app running while the Python process is active. |
-| Species dropdown | Browser UI | Uses the intersection of `ebird_filtered_checklist/*.csv` and `validation_prediction_summary/mad_filter_abundance/*.csv`. |
-| Grid-level summaries | Browser UI | Click a grid to inspect mean abundance, abundance trend, range, and checklist sample count. |
 
 ### Start the dashboard
 
