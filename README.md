@@ -304,17 +304,24 @@ Output locations and file patterns:
 
 CLI parameters:
 
+Operation parameters are the options users most commonly adjust for controlling the workflow.
+
 | Command | Purpose | Input format / default |
 |---|---|---|
-| `--mode` | Select which part of the workflow to run. | One of `sampling`, `imputation`, `aggregate`, `all`. Default: `all`. |
-| `--eu-shp-path` | Set the EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
-| `--input-csv` | Set the input CSV with missing land-cover values. | File path. Default: `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`. |
-| `--output-folder` | Set the project root used for output folders. | Folder path. Default: script folder / project root. |
-| `--seed-start` | First seed number. | Integer. Default: `123`. |
-| `--seed-end` | Last seed number. | Integer. Default: `222`. |
-| `--n-cores` | Number of CPU cores for parallel processing. | Integer. Default: `2`. |
-| `--land-cover-types` | Select land-cover types to impute. | Comma-separated values. Default: all 9 types: `bare,built,crops,flooded_vegetation,grass,shrub_and_scrub,snow_and_ice,trees,water`. |
-| `--help` | Show help message. | No value. |
+| <nobr><code>--mode</code></nobr> | Select which part of the workflow to run. | One of `sampling`, `imputation`, `aggregate`, `all`. Default: `all`. |
+| <nobr><code>--seed-start</code></nobr> | First seed number. | Integer. Default: `123`. |
+| <nobr><code>--seed-end</code></nobr> | Last seed number. | Integer. Default: `222`. |
+| <nobr><code>--n-cores</code></nobr> | Number of CPU cores for parallel processing. | Integer. Default: `2`. |
+| <nobr><code>--land-cover-types</code></nobr> | Select land-cover types to impute. | Comma-separated values. Default: all 9 types: `bare,built,crops,flooded_vegetation,grass,shrub_and_scrub,snow_and_ice,trees,water`. |
+| <nobr><code>--help</code></nobr> | Show help message. | No value. |
+
+Path parameters are usually left unchanged. The CLI is designed to work with the default relative project structure, so changing these paths is only recommended when your data are stored outside the project folder.
+
+| Command | Purpose | Input format / default |
+|---|---|---|
+| <nobr><code>--eu-shp-path</code></nobr> | Set the EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
+| <nobr><code>--input-csv</code></nobr> | Set the input CSV with missing land-cover values. | File path. Default: `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`. |
+| <nobr><code>--output-folder</code></nobr> | Set the project root used for output folders. | Folder path. Default: script folder / project root. |
 
 Simplest usage:
 
@@ -363,32 +370,39 @@ Output locations and file patterns:
 
 CLI parameters:
 
+Operation parameters are the options users most commonly adjust for choosing species, model settings, filtering rules, and reproducibility.
+
 | Command | Purpose | Input format / default |
 |---|---|---|
-| `--species` | Run selected species. | Scientific name, comma-separated names, or repeated values. Example: `"Anas crecca"` or `"Anas crecca,Ardea alba"`. |
-| `--species-file` | Run species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
-| `--all-species` | Run all species found in `ebird_filtered_checklist/`. | No value. |
-| `--list-species` | List available species and exit. | No value. |
-| `--eu-shp-path` | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
-| `--env-folder` | Set ERA5-Land environmental CSV folder. | Folder path. Default: `gee_data/era5_2016_2022/`. |
-| `--lc-path` | Set processed land-cover CSV path. | File path. Default: `gee_data/land_cover_2016_2022.csv`. |
-| `--checklist-folder` | Set filtered eBird checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
-| `--output-folder` | Set output root folder. | Folder path. Default: script folder / project root. |
-| `--start-year` | Start year for filtering. | Integer. Default: `2021`. |
-| `--end-year` | End year for filtering. | Integer. Default: `2022`. |
-| `--protocol` | Select eBird protocol(s). | Comma-separated values. Default: `Traveling`. |
-| `--obs-quantile-cutoff` | Observation count outlier cutoff. | Numeric quantile. Default: `0.99`. |
-| `--observer-quantile-cutoff` | Observer-level cutoff. | Numeric quantile. Default: `0.7`. |
-| `--grid-quantile-cutoff` | Grid-level cutoff. | Numeric quantile. Default: `0.5`. |
-| `--validation-ratio` | Validation split ratio. | Numeric value between 0 and 1. Default: `0.1`. |
-| `--n-iter` | Number of model iterations. | Integer. Default: `3`. |
-| `--seed` | Random seed. | Integer. Default: `123`. |
-| `--help` | Show help message. | No value. |
+| <nobr><code>--species</code></nobr> | Run selected species. | Scientific name, comma-separated names, or repeated values. Example: `"Anas crecca"` or `"Anas crecca,Ardea alba"`. |
+| <nobr><code>--species-file</code></nobr> | Run species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
+| <nobr><code>--all-species</code></nobr> | Run all species found in `ebird_filtered_checklist/`. | No value. |
+| <nobr><code>--list-species</code></nobr> | List available species and exit. | No value. |
+| <nobr><code>--start-year</code></nobr> | Start year for filtering. | Integer. Default: `2021`. |
+| <nobr><code>--end-year</code></nobr> | End year for filtering. | Integer. Default: `2022`. |
+| <nobr><code>--protocol</code></nobr> | Select eBird protocol(s). | Comma-separated values. Default: `Traveling`. |
+| <nobr><code>--obs-quantile-cutoff</code></nobr> | Observation count outlier cutoff. | Numeric quantile. Default: `0.99`. |
+| <nobr><code>--observer-quantile-cutoff</code></nobr> | Observer-level cutoff. | Numeric quantile. Default: `0.7`. |
+| <nobr><code>--grid-quantile-cutoff</code></nobr> | Grid-level cutoff. | Numeric quantile. Default: `0.5`. |
+| <nobr><code>--validation-ratio</code></nobr> | Validation split ratio. | Numeric value between 0 and 1. Default: `0.1`. |
+| <nobr><code>--n-iter</code></nobr> | Number of model iterations. | Integer. Default: `3`. |
+| <nobr><code>--seed</code></nobr> | Random seed. | Integer. Default: `123`. |
+| <nobr><code>--help</code></nobr> | Show help message. | No value. |
+
+Path parameters are usually left unchanged. The CLI is designed to work with the default relative project structure, so changing these paths is only recommended when your data are stored outside the project folder.
+
+| Command | Purpose | Input format / default |
+|---|---|---|
+| <nobr><code>--eu-shp-path</code></nobr> | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
+| <nobr><code>--env-folder</code></nobr> | Set ERA5-Land environmental CSV folder. | Folder path. Default: `gee_data/era5_2016_2022/`. |
+| <nobr><code>--lc-path</code></nobr> | Set processed land-cover CSV path. | File path. Default: `gee_data/land_cover_2016_2022.csv`. |
+| <nobr><code>--checklist-folder</code></nobr> | Set filtered eBird checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
+| <nobr><code>--output-folder</code></nobr> | Set output root folder. | Folder path. Default: script folder / project root. |
 
 Simplest usage:
 
 ```powershell
-Rscript ".\run_abundance_prediction.R" --species "Anas crecca"
+Rscript ".\run_abundance_prediction.R" --all-species
 ```
 
 Example usage:
@@ -435,28 +449,45 @@ Output locations and file patterns:
 
 CLI parameters:
 
+Operation parameters are the options users most commonly adjust for choosing species, ensemble settings, MAD filtering, and map outputs.
+
 | Command | Purpose | Input format / default |
 |---|---|---|
-| `--species` | Process selected species. | Scientific name, comma-separated names, or repeated values. |
-| `--species-file` | Process species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
-| `--all-species` | Process all species available under `abundance_prediction/`. | No value. |
-| `--list-species` | List species currently available for post-processing and exit. | No value. |
-| `--abundance-root` | Set root folder created by `run_abundance_prediction.R`. | Folder path. Default: `abundance_spatiotemporal_sampling_method/`. |
-| `--validation-folder` | Set validation data folder. | Folder path. Default: `validation_data/`. |
-| `--checklist-folder` | Set checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
-| `--bird-type-csv` | Set bird type lookup CSV. | File path. Default: `bird_type_lookup.csv`. |
-| `--eu-shp-path` | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
-| `--output-folder` | Set output root folder. | Folder path. Default: script folder / project root. |
-| `--n-iter` | Number of iterations to combine. | Integer. Default: auto-detect. |
-| `--mad-k` | MAD filter multiplier. | Numeric value. Default: `1.5`. |
-| `--map-years` | Years used for species map output. | Comma-separated years. Default: auto-detect all years. |
-| `--map-months` | Months used for species map output. | Comma-separated month numbers. Default: `1,4,7,10`. |
-| `--help` | Show help message. | No value. |
+| <nobr><code>--species</code></nobr> | Process selected species. | Scientific name, comma-separated names, or repeated values. |
+| <nobr><code>--species-file</code></nobr> | Process species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
+| <nobr><code>--all-species</code></nobr> | Process all species available under `abundance_prediction/`. | No value. |
+| <nobr><code>--list-species</code></nobr> | List species currently available for post-processing and exit. | No value. |
+| <nobr><code>--n-iter</code></nobr> | Number of iterations to combine. | Integer. Default: auto-detect. |
+| <nobr><code>--mad-k</code></nobr> | MAD filter multiplier. | Numeric value. Default: `1.5`. |
+| <nobr><code>--map-years</code></nobr> | Years used for species map output. | Comma-separated years. Default: auto-detect all years. |
+| <nobr><code>--map-months</code></nobr> | Months used for species map output. | Comma-separated month numbers. Default: `1,4,7,10`. |
+| <nobr><code>--help</code></nobr> | Show help message. | No value. |
+
+Path parameters are usually left unchanged. The CLI is designed to work with the default relative project structure, so changing these paths is only recommended when your data are stored outside the project folder.
+
+| Command | Purpose | Input format / default |
+|---|---|---|
+| <nobr><code>--abundance-root</code></nobr> | Set root folder created by `run_abundance_prediction.R`. | Folder path. Default: `abundance_spatiotemporal_sampling_method/`. |
+| <nobr><code>--validation-folder</code></nobr> | Set validation data folder. | Folder path. Default: `validation_data/`. |
+| <nobr><code>--checklist-folder</code></nobr> | Set checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
+| <nobr><code>--bird-type-csv</code></nobr> | Set bird type lookup CSV. | File path. Default: `bird_type_lookup.csv`. |
+| <nobr><code>--eu-shp-path</code></nobr> | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
+| <nobr><code>--output-folder</code></nobr> | Set output root folder. | Folder path. Default: script folder / project root. |
 
 Simplest usage:
 
+Before running all species, you can first list species that already have outputs from `run_abundance_prediction.R`.
+
+List available species:
+
 ```powershell
-Rscript ".\run_validation_and_prediction_summary.R" --species "Anas crecca"
+Rscript ".\run_validation_and_prediction_summary.R" --list-species
+```
+
+Process all available species:
+
+```powershell
+Rscript ".\run_validation_and_prediction_summary.R" --all-species
 ```
 
 Example usage:
@@ -505,27 +536,44 @@ Output locations and file patterns:
 
 CLI parameters:
 
+Operation parameters are the options users most commonly adjust for choosing outbreak type, species, and output date tags.
+
 | Command | Purpose | Input format / default |
 |---|---|---|
-| `--outbreak-type` | Select outbreak type. | Required. One of `Wild` or `Domestic`. |
-| `--species` | Analyze selected species. | Scientific name, comma-separated names, or repeated values. |
-| `--species-file` | Analyze species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
-| `--all-species` | Analyze all species available in `mad_filter_abundance/`. | No value. |
-| `--list-species` | List species currently available for AIV analysis and exit. | No value. |
-| `--eu-shp-path` | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
-| `--chicken-density-path` | Set chicken density CSV path. | File path. Default: `livestock_density_10km/chicken livestock density 10km.csv`. |
-| `--duck-density-path` | Set duck density CSV path. | File path. Default: `livestock_density_10km/duck livestock density_2015_10km.csv`. |
-| `--aiv-2021-path` | Set 2021 AIV fixed data path. | File path. Default: `aiv_fixed_data/EU aiv fixed data 2021.csv`. |
-| `--aiv-2022-path` | Set 2022 AIV fixed data path. | File path. Default: `aiv_fixed_data/EU aiv fixed data 2022.csv`. |
-| `--bird-abundance-folder` | Set MAD-filtered abundance folder. | Folder path. Default: `validation_prediction_summary/mad_filter_abundance/`. |
-| `--output-folder` | Set output root folder. | Folder path. Default: script folder / project root. |
-| `--write-date` | Set output date tag. | Format `YYYYMMDD`. Default: today's date. |
-| `--help` | Show help message. | No value. |
+| <nobr><code>--outbreak-type</code></nobr> | Select outbreak type. | Required. One of `Wild` or `Domestic`. |
+| <nobr><code>--species</code></nobr> | Analyze selected species. | Scientific name, comma-separated names, or repeated values. |
+| <nobr><code>--species-file</code></nobr> | Analyze species listed in a TXT or CSV file. | File path. CSV can contain `scientific_name`, `birdname`, or use the first column. |
+| <nobr><code>--all-species</code></nobr> | Analyze all species available in `mad_filter_abundance/`. | No value. |
+| <nobr><code>--list-species</code></nobr> | List species currently available for AIV analysis and exit. | No value. |
+| <nobr><code>--write-date</code></nobr> | Set output date tag. | Format `YYYYMMDD`. Default: today's date. |
+| <nobr><code>--help</code></nobr> | Show help message. | No value. |
+
+Path parameters are usually left unchanged. The CLI is designed to work with the default relative project structure, so changing these paths is only recommended when your data are stored outside the project folder.
+
+| Command | Purpose | Input format / default |
+|---|---|---|
+| <nobr><code>--eu-shp-path</code></nobr> | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
+| <nobr><code>--chicken-density-path</code></nobr> | Set chicken density CSV path. | File path. Default: `livestock_density_10km/chicken livestock density 10km.csv`. |
+| <nobr><code>--duck-density-path</code></nobr> | Set duck density CSV path. | File path. Default: `livestock_density_10km/duck livestock density_2015_10km.csv`. |
+| <nobr><code>--aiv-2021-path</code></nobr> | Set 2021 AIV fixed data path. | File path. Default: `aiv_fixed_data/EU aiv fixed data 2021.csv`. |
+| <nobr><code>--aiv-2022-path</code></nobr> | Set 2022 AIV fixed data path. | File path. Default: `aiv_fixed_data/EU aiv fixed data 2022.csv`. |
+| <nobr><code>--bird-abundance-folder</code></nobr> | Set MAD-filtered abundance folder. | Folder path. Default: `validation_prediction_summary/mad_filter_abundance/`. |
+| <nobr><code>--output-folder</code></nobr> | Set output root folder. | Folder path. Default: script folder / project root. |
 
 Simplest usage:
 
+Before running all species, you can first list species that already have outputs from `run_abundance_prediction.R`.
+
+List available species:
+
 ```powershell
-Rscript ".\run_aiv_analysis.R" --outbreak-type Wild --species "Anas crecca"
+Rscript ".\run_aiv_analysis.R" --list-species
+```
+
+Process all available species:
+
+```powershell
+Rscript ".\run_aiv_analysis.R" --outbreak-type Wild --all-species
 ```
 
 Example usage:
@@ -569,15 +617,22 @@ Output / runtime behavior:
 
 CLI parameters:
 
+Operation parameters are the options users most commonly adjust for choosing the initial species and local dashboard server settings.
+
 | Command | Purpose | Input format / default |
 |---|---|---|
-| `--eu-shp-path` | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
-| `--checklist-folder` | Set checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
-| `--abundance-folder` | Set MAD-filtered abundance folder. | Folder path. Default: `validation_prediction_summary/mad_filter_abundance/`. |
-| `--species` | Set initial species shown in the dashboard. | Scientific name. Default: first available species. |
-| `--host` | Set Dash host. | Host string. Default: `127.0.0.1`. |
-| `--port` | Set Dash port. | Integer. Default: `8050`. |
-| `--debug` | Enable Dash debug mode. | No value. Default: off. |
+| <nobr><code>--species</code></nobr> | Set initial species shown in the dashboard. | Scientific name. Default: first available species. |
+| <nobr><code>--host</code></nobr> | Set Dash host. | Host string. Default: `127.0.0.1`. |
+| <nobr><code>--port</code></nobr> | Set Dash port. | Integer. Default: `8050`. |
+| <nobr><code>--debug</code></nobr> | Enable Dash debug mode. | No value. Default: off. |
+
+Path parameters are usually left unchanged. The dashboard is designed to work with the default relative project structure, so changing these paths is only recommended when your data are stored outside the project folder.
+
+| Command | Purpose | Input format / default |
+|---|---|---|
+| <nobr><code>--eu-shp-path</code></nobr> | Set EU grid shapefile path. | File path. Default: `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`. |
+| <nobr><code>--checklist-folder</code></nobr> | Set checklist folder. | Folder path. Default: `ebird_filtered_checklist/`. |
+| <nobr><code>--abundance-folder</code></nobr> | Set MAD-filtered abundance folder. | Folder path. Default: `validation_prediction_summary/mad_filter_abundance/`. |
 
 Simplest usage:
 
