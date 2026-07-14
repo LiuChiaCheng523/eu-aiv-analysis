@@ -1,8 +1,8 @@
-﻿## 撠???
+## 專案摘要
 
-?祉?蝛嗅?獢?璈摮貊??葫 2021 撟渲 2022 撟湧??瘣脩汗瘚?擃◢?芸葆?野蝔桃??征?詨?鞊漲嚗閮?66 蝔柴?蝯?皜祉??蝙??Python Plotly ?脰?鈭?撘閬??蝙?刻暺銝?曈仿??迂嚗?頛??征?雿?撟喳??詨?鞊漲嚗誑?蝛粹??桐???頞典?脩?霈???
+本研究專案透過機器學習預測 2021 年至 2022 年部分歐洲禽流感高風險帶原鳥種的時空相對豐度，共計 66 種。最終預測結果使用 Python Plotly 進行互動式可視化。使用者可點選不同鳥類名稱，比較不同空間單位的平均相對豐度，以及個別空間單位的月趨勢曲線變化。
 
-?湧??弦蝯??鈭野?瑕?璅∪?嚗摮???蝘駁??穿?憭迤敺?蝘駁?芋???甇??撖?隤歹?銝虫誑?啣???撽??葫蝯???蝥????歇?亦汗瘚??獢??誨蝢拙??扳芋??撽?憭車曈仿?嚗陘?嗆瘞湧野嚗?急??擃陸???砍迤?摮??＊??擃?憸券??
+整體研究結果重現了候鳥遷徙模式：冬季往南遷移過冬，夏季往北遷移避暑。模型同時校正觀察者偏誤，並以環境因子驅動預測結果。後續分析結合已知禽流感爆發案例與廣義加性模型，驗證多種鳥類，尤其是水鳥，在疫情爆發高峰期的冬季與春季具有顯著較高的風險。
 
 ## Project Summary
 
@@ -12,144 +12,144 @@ The overall results reproduce broad migratory bird movement patterns, with birds
 
 ![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
 
-## 鞈?靘?
+## 資料來源
 
-?游?憭????皞?撱箇?甇散蝳賣???憸券曈亦車銋?蝛箄?摨西??急?憸券??鞈?摨怒蜓閬???皞??恬?
+整合多個公開資料來源，建立歐洲禽流感高風險鳥種之時空豐度與疫情風險分析資料庫。主要資料來源包含：
 
 1. **eBird checklist**
    - Website: https://science.ebird.org/en/use-ebird-data/download-ebird-data-products
-   - 雿曈仿?閫皜祉????詨?鞊漲撱箸芋?蜓閬???皞?
-   - 鞈??曈亦車閫撖???皜祆????蝵柴?撖?閮?閫皜砍??蝑?雿?
-   - ?祉?蝛嗡蝙??2021 ??2022 撟湔??? eBird 曈仿?閫皜祈??脰?璅∪?閮毀??皜研?
+   - 作為鳥類觀測紀錄與相對豐度建模的主要資料來源。
+   - 資料包含鳥種觀察紀錄、觀測時間、地理位置、觀察者資訊與觀測努力量等欄位。
+   - 本研究使用 2021 至 2022 年期間之 eBird 鳥類觀測資料進行模型訓練與預測。
 
 2. **eBird Status and Trends**
    - Website: https://science.ebird.org/status-and-trends
-   - ?冽撽??祉?蝛嗆?隡啗?銋野憿撠?摨行?蝛箏?撣隅?Ｕ?
-   - 閰脰???靘野蝔桀銝????征???撠?摨艾?暹?????蝭?蝑?閮?
+   - 用於驗證本研究所估計之鳥類相對豐度時空分布趨勢。
+   - 該資料提供鳥種在不同時間與空間下的相對豐度、出現機率與分布範圍等資訊。
 
 3. **FAO EMPRES-i**
    - Website: https://empres-i.apps.fao.org/
-   - 雿蝳賣????靘???皞?
-   - 雿輻 2021 ??2022 撟湔?瘣脣?摰嗥汗??曈乩?蝳賣??蝝????曈仿?鞊漲????潮◢?芯????
+   - 作為禽流感疫情案例資料來源。
+   - 使用 2021 至 2022 年歐洲地區家禽與野鳥之禽流感通報紀錄，分析鳥類豐度與疫情爆發風險之關聯。
 
 4. **FAO Livestock Systems**
    - Website: https://data.apps.fao.org/
-   - 雿摰嗥汗擗?撖漲鞈?靘???
-   - 蝝??暾其??桐??Ｙ?擗?撖漲嚗??箇汗瘚?憸券璅∪?銝剔??批霈???券◢?芸?摮?
+   - 作為家禽養殖密度資料來源。
+   - 納入雞與鴨之單位面積養殖密度，作為禽流感風險模型中的控制變數與潛在風險因子。
 
 5. **Google Earth Engine**
    - Website: https://earthengine.google.com/
    - API access: https://developers.google.com/earth-engine/guides/access
    - ERA5-Land: https://developers.google.com/earth-engine/datasets/catalog/ECMWF_ERA5_LAND_DAILY_AGGR
    - Dynamic World: https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1
-   - ?祉?蝛園? Google Earth Engine ??銵??葫?除?憓???
-   - 雿輻 ERA5-Land Daily Aggregated 瘞????靘??啗”皞怠漲???券??◢??瞈漲蝑憓??詻?
-   - 雿輻 Dynamic World ?閬?鞈?嚗?敺偌?噙?啜ㄝ?犖?遣?啁??閬?瘥???
-   - ?祉?蝛嗡蝙??**Google Earth Engine Python API** 銝?????皜祈???雿輻???隢蒂? GEE API??
-   - 銝?鞈???皞?撠??弦蝭?銋?`.shp` 蝛粹???瑼??冽閮??雯?澆??蝔桅?皜祈?瘞?絞閮???
+   - 本研究透過 Google Earth Engine 取得衛星遙測與氣候環境資料。
+   - 使用 ERA5-Land Daily Aggregated 氣候資料，例如地表溫度、降雨量、風速與濕度等環境變數。
+   - 使用 Dynamic World 土地覆蓋資料，取得水域、農地、森林、人造建地等土地覆蓋比例。
+   - 本研究使用 **Google Earth Engine Python API** 下載與處理遙測資料；使用前需先申請並啟用 GEE API。
+   - 下載資料時需準備對應研究範圍之 `.shp` 空間邊界檔，用於計算各網格內的多種遙測與氣候統計量。
 
-6. **European 100 km ? 100 km grid**
+6. **European 100 km × 100 km grid**
    - QGIS: https://www.qgis.org/
-   - ?祉?蝛嗡誑甇散?啣? 100 ?祇? ? 100 ?祇?蝬脫雿銝餉?蝛粹????桐???
-   - 蝬脫鞈??臬??QGIS 撠??瘣脣??`.shp` 瑼脰??極??敺遣蝡????箏?閫??摨衣雯?潦??????像皛??楠嚗誑??雿?shapefile 瑼?憭批???
-   - ??野憿?皜研憓?摮??啗??振蝳賢?摨西?蝳賣???靘??????遢?雯?潮脰??征????
+   - 本研究以歐洲地區 100 公里 × 100 公里網格作為主要空間分析單位。
+   - 網格資料是利用 QGIS 對公開歐洲地圖 `.shp` 檔進行加工處理後建立，包括切割固定解析度網格、處理邊界區域、平滑化邊緣，以及降低 shapefile 檔案大小。
+   - 所有鳥類觀測、環境因子、土地覆蓋、家禽密度與禽流感案例資料，皆依月份與網格進行時空配對。
 
-## ?弦?寞??嗆?
+## 研究方法架構
 
-?祉?蝛嗆瘜瑽?鈭蜓閬?畾蛛?鞈??游????????啗??撩憭勗潸??潦野憿撠?摨血遣璅～汗瘚?憸券??嚗誑????閬死??
+本研究方法架構可分為五個主要階段：資料整合與前處理、土地覆蓋缺失值補值、鳥類相對豐度建模、禽流感風險分析，以及互動式視覺化。
 
 ```text
 1. Data Integration and Preprocessing
-   鞈??游?????
-   ??
-   ??? eBird checklist bird observation records
-   ??  eBird 曈仿?閫皜祉???
-   ??
-   ??? ERA5-Land climate variables
-   ??  ERA5-Land 瘞?憓?摮?
-   ??
-   ??? Dynamic World land-cover variables
-   ??  Dynamic World ?閬???
-   ??
-   ??? FAO poultry density data
-   ??  FAO 摰嗥汗擗?撖漲鞈?
-   ??
-   ??? FAO EMPRES-i avian influenza records
-   ??  FAO EMPRES-i 蝳賣??蝝??
-   ??
-   ??? European 100 km ? 100 km grid
-       甇散 100 ?祇? ? 100 ?祇?蝬脫
+   資料整合與前處理
+   │
+   ├── eBird checklist bird observation records
+   │   eBird 鳥類觀測紀錄
+   │
+   ├── ERA5-Land climate variables
+   │   ERA5-Land 氣候環境因子
+   │
+   ├── Dynamic World land-cover variables
+   │   Dynamic World 土地覆蓋因子
+   │
+   ├── FAO poultry density data
+   │   FAO 家禽養殖密度資料
+   │
+   ├── FAO EMPRES-i avian influenza records
+   │   FAO EMPRES-i 禽流感通報紀錄
+   │
+   └── European 100 km × 100 km grid
+       歐洲 100 公里 × 100 公里網格
       
-    - ?祉?蝛嗅?銝?靘??????偕摨西?蝛粹?撠箏漲????蝯曹??渡???隞?? 100 ?祇? ? 100 ?祇?蝬脫????鞈?銵具?
-    - eBird 曈仿?閫皜祉????扯?皜祆??摨扳?嚗???孵??遢?雯?潦?
-    - ERA5-Land 瘞???? Dynamic World ?閬?鞈?嚗? Google Earth Engine Python API 閮???隞賬?蝬脫?抒??啣?蝯梯???
-    - FAO 摰嗥汗擗?撖漲鞈???FAO EMPRES-i 蝳賣??蝝??靘征??蝵桅?撠?詨?蝬脫嚗蒂靘?隞賢??氬?
-    - ?游?敺?鞈?銵其誑瘥??誨銵其???隞?? 蝬脫?雿?雿敺??閬?鋆潦野憿撠?摨血遣璅∟?蝳賣??◢?芸????箇???
-        ??
+    - 本研究將不同來源、不同時間尺度與空間尺度的資料，統一整理成「月份 × 100 公里 × 100 公里網格」的分析資料表。
+    - eBird 鳥類觀測紀錄依照觀測日期與座標，對應到特定月份與網格。
+    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，透過 Google Earth Engine Python API 計算各月份、各網格內的環境統計量。
+    - FAO 家禽養殖密度資料與 FAO EMPRES-i 禽流感通報紀錄，依空間位置配對至相同網格，並依月份彙整。
+    - 整合後的資料表以每一列代表一個「月份 × 網格」單位，作為後續土地覆蓋補值、鳥類相對豐度建模與禽流感風險分析的基礎。
+        ↓
 
 2. Dynamic World Land-cover Imputation
-   Dynamic World ?閬?蝻箏仃?潸???
-   ??
-   ??? Logit transformation for land-cover proportions
-   ??  ?閬?瘥? logit 頧?
-   ??
-   ??? XGBoost regression using climate variables and coordinates
-   ??  雿輻瘞??摮?蝬楝摨血漣璅脰? XGBoost 餈湔飛鋆?
-   ??
-   ??? Validation using RMSE and MAE
-       雿輻 RMSE ??MAE ?脰?鋆潛???霅?
-        ??
+   Dynamic World 土地覆蓋缺失值補值
+   │
+   ├── Logit transformation for land-cover proportions
+   │   土地覆蓋比例 logit 轉換
+   │
+   ├── XGBoost regression using climate variables and coordinates
+   │   使用氣候因子與經緯度座標進行 XGBoost 迴歸補值
+   │
+   └── Validation using RMSE and MAE
+       使用 RMSE 與 MAE 進行補值結果驗證
+        ↓
 
 3. Bird Relative Abundance Modeling
-   曈仿??詨?鞊漲撱箸芋
-   ??
-   ??? eBird checklist filtering
-   ??  eBird 閫皜祈??祟??
-   ??
-   ??? Observer bias correction using GLMM
-   ??  雿輻 GLMM ?⊥迤閫撖?隤?
-   ??
-   ??? Spatiotemporal sampling strategy
-   ??  ?征?賣見蝑
-   ??
-   ??? XGBoost Poisson model for each risk bird species
-   ??  ???◢?芷野蝔桀遣蝡?XGBoost Poisson 璅∪?
-   ??  - 璅∪??孵噩? 59 蝔?ERA5-Land 瘞??摮? 蝔?Dynamic World ?閬????Bird 閫皜砍??嚗誑??撖?隤斗甇??璅???
-   ??
-   ??? Model evaluation using SRC
-   ??  雿輻 SRC嚗pearman Rank Correlation嚗?隡唳芋??皜祈”??
-   ??
-   ??? Monthly grid-level relative abundance prediction
-       ?Ｙ??遢 ? 蝬脫撅斤?銋撠?摨阡?皜?
-        ??
+   鳥類相對豐度建模
+   │
+   ├── eBird checklist filtering
+   │   eBird 觀測資料篩選
+   │
+   ├── Observer bias correction using GLMM
+   │   使用 GLMM 校正觀察者偏誤
+   │
+   ├── Spatiotemporal sampling strategy
+   │   時空抽樣策略
+   │
+   ├── XGBoost Poisson model for each risk bird species
+   │   針對各風險鳥種建立 XGBoost Poisson 模型
+   │   - 模型特徵包含 59 種 ERA5-Land 氣候因子、9 種 Dynamic World 土地覆蓋因子、eBird 觀測努力量，以及觀察者偏誤校正指標等。
+   │
+   ├── Model evaluation using SRC
+   │   使用 SRC（Spearman Rank Correlation）評估模型預測表現
+   │
+   └── Monthly grid-level relative abundance prediction
+       產生月份 × 網格層級之相對豐度預測
+        ↓
 
 4. Avian Influenza Risk Analysis
-   蝳賣??◢?芸???
-   ??
-   ??? Weighted relative abundance by outbreak stage
-   ??  靘??畾菔?蝞?甈撠?摨?
-   ??
-   ??? Integration with poultry and wild bird outbreak records
-   ??  蝯?摰嗥汗??曈亦汗瘚??蝝??
-   ??
-   ??? Adjustment for chicken and duck density
-   ??  ?批??暾券?畾?摨?
-   ??
-   ??? Generalized Additive Model analysis
-       雿輻撱?儔?扳芋????◢??
-        ??
+   禽流感風險分析
+   │
+   ├── Weighted relative abundance by outbreak stage
+   │   依疫情階段計算加權相對豐度
+   │
+   ├── Integration with poultry and wild bird outbreak records
+   │   結合家禽與野鳥禽流感通報紀錄
+   │
+   ├── Adjustment for chicken and duck density
+   │   控制雞與鴨養殖密度
+   │
+   └── Generalized Additive Model analysis
+       使用廣義加性模型分析疫情風險
+        ↓
 
 5. Interactive Visualization
-   鈭?撘?閬箏?
-   ??
-   ??? Plotly Dash dashboard
-   ??  Plotly Dash ?銵冽
-   ??
-   ??? Species-level abundance map
-   ??  曈亦車撅斤??詨?鞊漲?啣?
-   ??
-   ??? Monthly trend curve by spatial unit
-       ?蝛粹??桐??隅?Ｘ蝺?
+   互動式視覺化
+   │
+   ├── Plotly Dash dashboard
+   │   Plotly Dash 儀表板
+   │
+   ├── Species-level abundance map
+   │   鳥種層級相對豐度地圖
+   │
+   └── Monthly trend curve by spatial unit
+       個別空間單位月趨勢曲線
 ```
 
 # CLI-based workflow
