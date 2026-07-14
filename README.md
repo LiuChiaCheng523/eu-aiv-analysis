@@ -1,12 +1,12 @@
 ## 專案摘要
 
-本研究專案透過機器學習預測 2021 年至 2022 年部分歐洲禽流感高風險帶原鳥種的時空相對豐度，共計 66 種。最終預測結果使用 Python Plotly 進行互動式可視化。使用者可點選不同鳥類名稱，比較不同空間單位的平均相對豐度，以及個別空間單位的月趨勢曲線變化。
+本研究專案透過機器學習預測 2021 年至 2022 年部分歐洲禽流感高風險帶原鳥種的時空相對豐度，共計 67 種。最終預測結果使用 Python Plotly 進行互動式可視化。使用者可點選不同鳥類名稱，比較不同空間單位的平均相對豐度，以及個別空間單位的月趨勢曲線變化。
 
 整體研究結果重現了候鳥遷徙模式：冬季往南遷移過冬，夏季往北遷移避暑。模型同時校正觀察者偏誤，並以環境因子驅動預測結果。後續分析結合已知禽流感爆發案例與廣義加性模型，驗證多種鳥類，尤其是水鳥，在疫情爆發高峰期的冬季與春季具有顯著較高的風險。
 
 ## Project Summary
 
-This research project uses machine learning to predict the spatiotemporal relative abundance of 66 high-risk avian influenza carrier bird species across parts of Europe from 2021 to 2022. The final prediction outputs are visualized through an interactive Python Plotly dashboard. Users can select different bird species to compare average relative abundance across spatial units and examine monthly trend curves within individual spatial units.
+This research project uses machine learning to predict the spatiotemporal relative abundance of 67 high-risk avian influenza carrier bird species across parts of Europe from 2021 to 2022. The final prediction outputs are visualized through an interactive Python Plotly dashboard. Users can select different bird species to compare average relative abundance across spatial units and examine monthly trend curves within individual spatial units.
 
 The overall results reproduce broad migratory bird movement patterns, with birds moving southward in winter for overwintering and northward in summer. The modeling workflow also corrects for observer bias and uses environmental variables to drive abundance predictions. Subsequent analyses combine known avian influenza outbreak records with generalized additive models to evaluate seasonal risk, showing that many bird species, especially waterbirds, have significantly higher risk during the winter and spring outbreak peaks.
 
@@ -265,6 +265,34 @@ python -m pip install --upgrade pip setuptools wheel
 python -m pip install numpy pandas plotly dash geopandas shapely pyogrio fiona
 ```
 
+## Quick Start
+
+If the required data folders have already been downloaded and placed under the project root, the main workflow can start from abundance prediction. For a quick test, start with one species before running all species.
+
+Single-species test run:
+
+```powershell
+Rscript ".\run_abundance_prediction.R" --species "Anas crecca"
+Rscript ".\run_validation_and_prediction_summary.R" --species "Anas crecca"
+Rscript ".\run_aiv_analysis.R" --outbreak-type Wild --species "Anas crecca"
+python ".\Plotly_Dashboard.py" --species "Anas crecca"
+```
+
+Full all-species workflow:
+
+```powershell
+Rscript ".\run_abundance_prediction.R" --all-species
+Rscript ".\run_validation_and_prediction_summary.R" --all-species
+Rscript ".\run_aiv_analysis.R" --outbreak-type Wild --all-species
+python ".\Plotly_Dashboard.py"
+```
+
+Notes:
+
+- `run_land_cover_imputation.R` is optional if `gee_data/land_cover_2016_2022.csv` already exists.
+- Running `--all-species` can take a long time and generate many output files.
+- The dashboard requires `validation_prediction_summary/mad_filter_abundance/`, which is created by the validation / prediction summary CLI.
+
 ## Workflow Order
 
 The usual workflow is:
@@ -274,6 +302,14 @@ The usual workflow is:
 3. Run [`run_validation_and_prediction_summary.R`](#3-validation--prediction-summary-cli) to combine model iterations and export MAD-filtered abundance data.
 4. Run [`run_aiv_analysis.R`](#4-aiv-analysis-cli) to analyze Wild or Domestic AIV associations.
 5. Run [`Plotly_Dashboard.py`](#5-plotly-dashboard) to explore the processed abundance outputs interactively.
+
+## Workflow Dependency Summary
+
+- `run_land_cover_imputation.R`: optional; only needed if regenerating the processed land-cover table.
+- `run_abundance_prediction.R`: can run after downloading the required data folders, as long as `gee_data/land_cover_2016_2022.csv` exists.
+- `run_validation_and_prediction_summary.R`: requires abundance prediction outputs under `abundance_spatiotemporal_sampling_method/` and validation data under `validation_data/`.
+- `run_aiv_analysis.R`: requires MAD-filtered abundance outputs under `validation_prediction_summary/mad_filter_abundance/`.
+- `Plotly_Dashboard.py`: requires MAD-filtered abundance outputs under `validation_prediction_summary/mad_filter_abundance/`.
 
 ## 1. Land-cover Imputation CLI
 
@@ -768,3 +804,12 @@ Example usage:
 ```powershell
 python ".\Plotly_Dashboard.py" --species "Vanellus vanellus" --host 127.0.0.1 --port 8051
 ```
+
+## Troubleshooting
+
+- If `Rscript` is not recognized, add R to your system `PATH` or use the full `Rscript.exe` path.
+- If a folder is not found, check that all Google Drive data folders are extracted and placed directly under the project root.
+- If `run_validation_and_prediction_summary.R --list-species` shows no available species, run `run_abundance_prediction.R` first or check the `--abundance-root` path.
+- If `run_aiv_analysis.R` cannot find abundance files, check whether `validation_prediction_summary/mad_filter_abundance/` exists.
+- If the Plotly dashboard cannot start, confirm that the dashboard virtual environment is activated and that `validation_prediction_summary/mad_filter_abundance/` contains species CSV files.
+- If port `8050` is already in use, run the dashboard with another port, for example `python ".\Plotly_Dashboard.py" --port 8051`.
