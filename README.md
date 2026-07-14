@@ -10,6 +10,148 @@ This research project uses machine learning to predict the spatiotemporal relati
 
 The overall results reproduce broad migratory bird movement patterns, with birds moving southward in winter for overwintering and northward in summer. The modeling workflow also corrects for observer bias and uses environmental variables to drive abundance predictions. Subsequent analyses combine known avian influenza outbreak records with generalized additive models to evaluate seasonal risk, showing that many bird species, especially waterbirds, have significantly higher risk during the winter and spring outbreak peaks.
 
+![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
+
+## 資料來源
+
+整合多個公開資料來源，建立歐洲禽流感高風險鳥種之時空豐度與疫情風險分析資料庫。主要資料來源包含：
+
+1. **eBird checklist**
+   - Website: https://science.ebird.org/en/use-ebird-data/download-ebird-data-products
+   - 作為鳥類觀測紀錄與相對豐度建模的主要資料來源。
+   - 資料包含鳥種觀察紀錄、觀測時間、地理位置、觀察者資訊與觀測努力量等欄位。
+   - 本研究使用 2021 至 2022 年期間之 eBird 鳥類觀測資料進行模型訓練與預測。
+
+2. **eBird Status and Trends**
+   - Website: https://science.ebird.org/status-and-trends
+   - 用於驗證本研究所估計之鳥類相對豐度時空分布趨勢。
+   - 該資料提供鳥種在不同時間與空間下的相對豐度、出現機率與分布範圍等資訊。
+
+3. **FAO EMPRES-i**
+   - Website: https://empres-i.apps.fao.org/
+   - 作為禽流感疫情案例資料來源。
+   - 使用 2021 至 2022 年歐洲地區家禽與野鳥之禽流感通報紀錄，分析鳥類豐度與疫情爆發風險之關聯。
+
+4. **FAO Livestock Systems**
+   - Website: https://data.apps.fao.org/
+   - 作為家禽養殖密度資料來源。
+   - 納入雞與鴨之單位面積養殖密度，作為禽流感風險模型中的控制變數與潛在風險因子。
+
+5. **Google Earth Engine**
+   - Website: https://earthengine.google.com/
+   - API access: https://developers.google.com/earth-engine/guides/access
+   - ERA5-Land: https://developers.google.com/earth-engine/datasets/catalog/ECMWF_ERA5_LAND_DAILY_AGGR
+   - Dynamic World: https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1
+   - 本研究透過 Google Earth Engine 取得衛星遙測與氣候環境資料。
+   - 使用 ERA5-Land Daily Aggregated 氣候資料，例如地表溫度、降雨量、風速與濕度等環境變數。
+   - 使用 Dynamic World 土地覆蓋資料，取得水域、農地、森林、人造建地等土地覆蓋比例。
+   - 本研究使用 **Google Earth Engine Python API** 下載與處理遙測資料；使用前需先申請並啟用 GEE API。
+   - 下載資料時需準備對應研究範圍之 `.shp` 空間邊界檔，用於計算各網格內的多種遙測與氣候統計量。
+
+6. **European 100 km × 100 km grid**
+   - QGIS: https://www.qgis.org/
+   - 本研究以歐洲地區 100 公里 × 100 公里網格作為主要空間分析單位。
+   - 網格資料是利用 QGIS 對公開歐洲地圖 `.shp` 檔進行加工處理後建立，包括切割固定解析度網格、處理邊界區域、平滑化邊緣，以及降低 shapefile 檔案大小。
+   - 所有鳥類觀測、環境因子、土地覆蓋、家禽密度與禽流感案例資料，皆依月份與網格進行時空配對。
+
+## 研究方法架構
+
+本研究方法架構可分為五個主要階段：資料整合與前處理、土地覆蓋缺失值補值、鳥類相對豐度建模、禽流感風險分析，以及互動式視覺化。
+
+```text
+1. Data Integration and Preprocessing
+   資料整合與前處理
+   │
+   ├── eBird checklist bird observation records
+   │   eBird 鳥類觀測紀錄
+   │
+   ├── ERA5-Land climate variables
+   │   ERA5-Land 氣候環境因子
+   │
+   ├── Dynamic World land-cover variables
+   │   Dynamic World 土地覆蓋因子
+   │
+   ├── FAO poultry density data
+   │   FAO 家禽養殖密度資料
+   │
+   ├── FAO EMPRES-i avian influenza records
+   │   FAO EMPRES-i 禽流感通報紀錄
+   │
+   └── European 100 km × 100 km grid
+       歐洲 100 公里 × 100 公里網格
+      
+    - 本研究將不同來源、不同時間尺度與空間尺度的資料，統一整理成「月份 × 100 公里 × 100 公里網格」的分析資料表。
+    - eBird 鳥類觀測紀錄依照觀測日期與座標，對應到特定月份與網格。
+    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，透過 Google Earth Engine Python API 計算各月份、各網格內的環境統計量。
+    - FAO 家禽養殖密度資料與 FAO EMPRES-i 禽流感通報紀錄，依空間位置配對至相同網格，並依月份彙整。
+    - 整合後的資料表以每一列代表一個「月份 × 網格」單位，作為後續土地覆蓋補值、鳥類相對豐度建模與禽流感風險分析的基礎。
+        ↓
+
+2. Dynamic World Land-cover Imputation
+   Dynamic World 土地覆蓋缺失值補值
+   │
+   ├── Logit transformation for land-cover proportions
+   │   土地覆蓋比例 logit 轉換
+   │
+   ├── XGBoost regression using climate variables and coordinates
+   │   使用氣候因子與經緯度座標進行 XGBoost 迴歸補值
+   │
+   └── Validation using RMSE and MAE
+       使用 RMSE 與 MAE 進行補值結果驗證
+        ↓
+
+3. Bird Relative Abundance Modeling
+   鳥類相對豐度建模
+   │
+   ├── eBird checklist filtering
+   │   eBird 觀測資料篩選
+   │
+   ├── Observer bias correction using GLMM
+   │   使用 GLMM 校正觀察者偏誤
+   │
+   ├── Spatiotemporal sampling strategy
+   │   時空抽樣策略
+   │
+   ├── XGBoost Poisson model for each risk bird species
+   │   針對各風險鳥種建立 XGBoost Poisson 模型
+   │   - 模型特徵包含 59 種 ERA5-Land 氣候因子、9 種 Dynamic World 土地覆蓋因子、eBird 觀測努力量，以及觀察者偏誤校正指標等。
+   │
+   ├── Model evaluation using SRC
+   │   使用 SRC（Spearman Rank Correlation）評估模型預測表現
+   │
+   └── Monthly grid-level relative abundance prediction
+       產生月份 × 網格層級之相對豐度預測
+        ↓
+
+4. Avian Influenza Risk Analysis
+   禽流感風險分析
+   │
+   ├── Weighted relative abundance by outbreak stage
+   │   依疫情階段計算加權相對豐度
+   │
+   ├── Integration with poultry and wild bird outbreak records
+   │   結合家禽與野鳥禽流感通報紀錄
+   │
+   ├── Adjustment for chicken and duck density
+   │   控制雞與鴨養殖密度
+   │
+   └── Generalized Additive Model analysis
+       使用廣義加性模型分析疫情風險
+        ↓
+
+5. Interactive Visualization
+   互動式視覺化
+   │
+   ├── Plotly Dash dashboard
+   │   Plotly Dash 儀表板
+   │
+   ├── Species-level abundance map
+   │   鳥種層級相對豐度地圖
+   │
+   └── Monthly trend curve by spatial unit
+       個別空間單位月趨勢曲線
+```
+
 # CLI-based workflow
 
 1. Bird abundance model training and prediction
@@ -18,49 +160,27 @@ The overall results reproduce broad migratory bird movement patterns, with birds
 4. Land-cover imputation
 5. Interactive Plotly dashboard
 
-The project has been reorganized so the main analyses can be run from the terminal without editing paths in the original scripts.
+## Scripts Download
 
-## Example Dashboard
+To download the analysis scripts, clone this GitHub repository using Git:
 
-![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
-
-## Important Path Rule
-
-You may rename the repository folder after cloning or downloading it.
-
-For example, these are all acceptable:
-
-```text
-abundance_r_test/
-bird_project_2026/
-my_local_bird_repo/
+```bash
+git clone https://github.com/LiuChiaCheng523/eu-aiv-analysis.git
 ```
-
-What must stay unchanged is the **internal relative folder structure**.
-
-In other words:
-
-- The CLI scripts do **not** require the root folder to be named `abundance_r_test`
-- The CLI scripts **do** expect sibling folders such as `gee_data/`, `EU_100km_fishnet_simple_by_distance/`, `ebird_filtered_checklist/`, and output folders to remain in the expected relative locations
-
-Example:
-
-```text
-bird_project_2026/
-├─ run_land_cover_imputation.R
-├─ gee_data/
-└─ EU_100km_fishnet_simple_by_distance/
-```
-
-This works because the script uses its own file location as the base directory.
 
 ## Data Download
-
-Large data files are not stored directly in this GitHub repository because of GitHub file size limits.
 
 Download the required data from Google Drive:
 
 [Google Drive folder](https://drive.google.com/drive/folders/1YX5561Yos3P4PsK1OfChdaQ7mAzx2Ihm)
+
+Including:
+
+1. aiv_fixed_data
+2. ebird_filtered_checklist
+3. EU_100km_fishnet_simple_by_distance
+4. gee_data
+5. livestock_density_10km
 
 After downloading:
 
@@ -69,6 +189,15 @@ After downloading:
 3. Keep the internal relative folder structure unchanged.
 
 ## Project Structure
+
+You may rename the repository folder after cloning or downloading it.
+
+What must stay unchanged is the **internal relative folder structure**.
+
+In other words:
+
+- The CLI scripts do **not** require the root folder to be named `abundance_r_test`
+- The CLI scripts **do** expect sibling folders such as `gee_data/`, `EU_100km_fishnet_simple_by_distance/`, `ebird_filtered_checklist/`, and output folders to remain in the expected relative locations
 
 ```text
 eu-aiv-analysis/
