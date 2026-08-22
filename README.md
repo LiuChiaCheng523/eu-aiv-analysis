@@ -182,13 +182,21 @@ Download the required data from Google Drive:
 
 [Google Drive folder](https://drive.google.com/drive/folders/1YX5561Yos3P4PsK1OfChdaQ7mAzx2Ihm)
 
-Including:
+Download and extract these zip files into the same project folder as the scripts:
 
-1. `aiv_fixed_data`
-2. `ebird_filtered_checklist`
-3. `EU_100km_fishnet_simple_by_distance`
-4. `gee_data`
-5. `livestock_density_10km`
+1. `gee_data.zip`
+   - Contains Google Earth Engine outputs used by the later modeling steps.
+   - Includes ERA5-Land climate tables from `01-ERA5-download-colab.ipynb`.
+   - Includes Dynamic World land-cover tables from `02-DynamicWorld-download-colab.ipynb`.
+   - Includes the processed / imputed `land_cover_2016_2022.csv` used by `05-gpboost-cli.py`, so users can start from step 05 without rerunning steps 01-03.
+2. `ebird_filtered_checklist.zip`
+   - Contains species-level filtered eBird checklist CSV files used for GPBoost abundance modeling.
+3. `EU_100km_fishnet_simple_by_distance.zip`
+   - Contains the European 100 km by 100 km grid shapefile and its sidecar files.
+4. `aiv_fixed_data.zip`
+   - Contains cleaned 2021 and 2022 avian influenza outbreak records.
+5. `livestock_density_10km.zip`
+   - Contains chicken and duck livestock density covariates.
 
 After downloading:
 
@@ -229,8 +237,13 @@ eu-aiv-analysis/
 Folder notes:
 
 - `gee_data/`: Google Earth Engine outputs, including ERA5-Land climate tables and Dynamic World land-cover tables.
+- `gee_data/era5_2016_2022/`: monthly ERA5-Land climate summaries for each 100 km grid.
+- `gee_data/land_cover_2016_2022.csv`: processed Dynamic World land-cover table. This is the main reason the workflow can start from `05-gpboost-cli.py`.
+- `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`: intermediate GEE table with missing land-cover values, used only if rerunning imputation.
 - `EU_100km_fishnet_simple_by_distance/`: European 100 km by 100 km grid shapefile.
 - `ebird_filtered_checklist/`: species-level filtered eBird checklist CSV files.
+- `aiv_fixed_data/`: cleaned FAO EMPRES-i outbreak records for 2021 and 2022.
+- `livestock_density_10km/`: chicken and duck density tables used in the AIV association analysis.
 - `gpboost_abundance_outputs/`: abundance model outputs created by `05-gpboost-cli.py`.
 - `all-birds-abd/`: simplified abundance CSVs created by `06-model-visualization-cli.py` and used by the AIV analysis.
 - `aiv_analysis/`: AIV model result tables.
@@ -258,7 +271,9 @@ The R scripts use packages such as `sf`, `dplyr`, `xgboost`, `mgcv`, `lubridate`
 
 ## Quick Start
 
-If the required Google Drive data folders are already placed under the project root, a small local test can start from one species:
+If the required Google Drive data folders are already placed under the project root, the local workflow can start from `05-gpboost-cli.py`. This is because `01-ERA5-download-colab.ipynb`, `02-DynamicWorld-download-colab.ipynb`, and `03-run_land_cover_imputation.R` have already been run, and their outputs are provided in `gee_data.zip`.
+
+A small local test can start from one species:
 
 ```powershell
 python ".\05-gpboost-cli.py" --birds "Anas crecca"
@@ -291,6 +306,10 @@ Inputs:
 - European 100 km grid shapefile.
 - Study years and month range configured inside the notebook.
 
+Default input path if placed with the notebook:
+
+- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: 100 km grid used to summarize ERA5-Land climate values by grid cell.
+
 Adjustable settings:
 
 - Study years and months.
@@ -302,6 +321,7 @@ Outputs:
 
 - ERA5-Land CSV files under `gee_data/era5_2016_2022/`.
 - Expected file pattern: `{year}_median_combined_result.csv`.
+- These outputs are already included in `gee_data.zip`.
 
 Model used:
 
@@ -319,6 +339,10 @@ Inputs:
 - European 100 km grid shapefile.
 - Study years and months configured inside the notebook.
 
+Default input path if placed with the notebook:
+
+- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: 100 km grid used to summarize Dynamic World land-cover probabilities by grid cell.
+
 Adjustable settings:
 
 - Study years and months.
@@ -330,6 +354,7 @@ Outputs:
 
 - Raw or processed land-cover CSV files under `gee_data/`.
 - If missing values remain, use `03-run_land_cover_imputation.R` to create the final `gee_data/land_cover_2016_2022.csv`.
+- These outputs are already included in `gee_data.zip`.
 
 Model used:
 
@@ -351,6 +376,11 @@ Inputs:
 - `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`
 - `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
 
+Default input paths if the data folders are placed with the script:
+
+- `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`: GEE-exported land-cover and climate table with missing land-cover values.
+- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: European 100 km grid shapefile.
+
 Adjustable parameters:
 
 - `--mode`: choose `sampling`, `imputation`, `aggregate`, or `all`.
@@ -365,6 +395,7 @@ Outputs:
 - `land_cover_imputation/ml_prediction_output/`: model prediction outputs.
 - `land_cover_imputation/two_method_performance/`: RMSE / MAE comparison tables.
 - `land_cover_imputation/final_output/`: final imputed land-cover CSVs.
+- The final processed land-cover table used later is provided in `gee_data.zip` as `gee_data/land_cover_2016_2022.csv`.
 
 Model used:
 
@@ -389,6 +420,13 @@ Inputs:
 - `gee_data/land_cover_2016_2022.csv`: processed land-cover table.
 - `gee_data/era5_2016_2022/2021_median_combined_result.csv`
 - `gee_data/era5_2016_2022/2022_median_combined_result.csv`
+
+Default input paths if the data folders are placed with the script:
+
+- `ebird_filtered_checklist/`: filtered eBird observation records for each species.
+- `gee_data/land_cover_2016_2022.csv`: final Dynamic World land-cover table after preprocessing / imputation.
+- `gee_data/era5_2016_2022/2021_median_combined_result.csv`: 2021 monthly ERA5-Land climate variables by grid.
+- `gee_data/era5_2016_2022/2022_median_combined_result.csv`: 2022 monthly ERA5-Land climate variables by grid.
 
 Adjustable parameters:
 
@@ -438,6 +476,15 @@ Inputs:
 - `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
 - `bird_type_lookup.csv`
 - `ebird_filtered_checklist/`
+
+Default input paths if the data folders are placed with the script:
+
+- `gpboost_abundance_outputs/`: species-level abundance, feature-importance, performance, and observer-random-effect outputs from `05-gpboost-cli.py`.
+- `gee_data/land_cover_2016_2022.csv`: land-cover covariates used for plotting and consistency checks.
+- `gee_data/era5_2016_2022/`: ERA5-Land climate tables.
+- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: grid geometry used to draw maps.
+- `bird_type_lookup.csv`: waterbird / non-waterbird lookup table.
+- `ebird_filtered_checklist/`: checklist files used to match species names and summarize samples.
 
 Adjustable parameters:
 
@@ -491,6 +538,15 @@ Inputs:
 - `livestock_density_10km/`: chicken and duck density CSVs.
 - `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
 
+Default input paths if the data folders are placed with the script:
+
+- `all-birds-abd/`: simplified monthly bird abundance tables created by `06-model-visualization-cli.py`.
+- `aiv_fixed_data/EU aiv fixed data 2021.csv`: cleaned 2021 AIV outbreak records.
+- `aiv_fixed_data/EU aiv fixed data 2022.csv`: cleaned 2022 AIV outbreak records.
+- `livestock_density_10km/chicken_livestock_density_10km.csv`: chicken density by grid.
+- `livestock_density_10km/duck_livestock_density_2015_10km.csv`: duck density by grid.
+- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: grid geometry and grid IDs.
+
 Adjustable code settings:
 
 - `outbreak_type`: choose `Domestic` or `Wild`.
@@ -535,6 +591,13 @@ Inputs:
 - `aiv_analysis/Wild_all_birds_single_stage_abundance_{csv_date}.csv`
 - `aiv_analysis/Domestic_all_birds_single_stage_abundance_{csv_date}.csv`
 - `aiv_analysis/Domestic_all_birds_single_stage_density_{csv_date}.csv`
+
+Default input paths if the data folders are placed with the script:
+
+- `bird_type_lookup.csv`: waterbird / non-waterbird lookup table.
+- `aiv_analysis/Wild_all_birds_single_stage_abundance_{csv_date}.csv`: Wild outbreak abundance-effect GAM results.
+- `aiv_analysis/Domestic_all_birds_single_stage_abundance_{csv_date}.csv`: Domestic outbreak abundance-effect GAM results.
+- `aiv_analysis/Domestic_all_birds_single_stage_density_{csv_date}.csv`: Domestic outbreak chicken / duck density-effect GAM results.
 
 Adjustable parameters:
 
