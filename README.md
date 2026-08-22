@@ -269,11 +269,11 @@ The Google Earth Engine notebooks also require notebook / Colab access and Earth
 
 Recommended version: `R 4.3.3`
 
-Install the required R packages from `r-packages.txt` in the same R environment used to run the scripts:
+Install the required R packages with `install-r-packages.R`. The script reads package names from `r-packages.txt` and installs only missing packages.
 
 ```powershell
 cd "your path/eu-aiv-analysis"
-Rscript -e "pkgs <- readLines('r-packages.txt'); pkgs <- pkgs[nzchar(pkgs)]; missing <- setdiff(pkgs, rownames(installed.packages())); if (length(missing) > 0) install.packages(missing, repos='https://cloud.r-project.org')"
+Rscript ".\install-r-packages.R"
 ```
 
 ## Quick Start
