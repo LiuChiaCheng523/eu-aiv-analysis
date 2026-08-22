@@ -269,7 +269,42 @@ The Google Earth Engine notebooks also require notebook / Colab access and Earth
 
 Recommended version: `R 4.3.3`
 
-The R scripts use packages such as `sf`, `dplyr`, `xgboost`, `mgcv`, `lubridate`, `terra`, `raster`, `ggplot2`, and related geospatial / modeling packages. Install missing packages in the same R environment used to run the scripts.
+Install the required R packages in the same R environment used to run the scripts:
+
+```r
+install.packages(c(
+  "sf",
+  "dplyr",
+  "xgboost",
+  "mgcv",
+  "lubridate",
+  "terra",
+  "raster",
+  "ggplot2",
+  "tidyr",
+  "zoo",
+  "forecast",
+  "lme4",
+  "MASS",
+  "brms",
+  "gridExtra",
+  "rnaturalearth",
+  "rnaturalearthdata",
+  "ggrepel",
+  "ggspatial",
+  "RColorBrewer",
+  "scales",
+  "geosphere",
+  "cowplot",
+  "pdp",
+  "viridis",
+  "fields",
+  "ebirdst",
+  "gbm",
+  "ROSE",
+  "caret"
+))
+```
 
 ## Quick Start
 
@@ -278,6 +313,7 @@ If the required Google Drive data folders are already placed under the project r
 A small local test can start from one species:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 python ".\05-gpboost-cli.py" --birds "Anas crecca"
 python ".\06-model-visualization-cli.py"
 ```
@@ -285,6 +321,7 @@ python ".\06-model-visualization-cli.py"
 To run all checklist species:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 python ".\05-gpboost-cli.py" --birds all
 python ".\06-model-visualization-cli.py"
 ```
@@ -292,6 +329,7 @@ python ".\06-model-visualization-cli.py"
 Run `07-aiv-outbreak-analysis.R` after checking and editing the hard-coded input and output paths inside the script. Then use the same `write_csv_date` value in `08-analysis-visualization-cli.py`:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 Rscript ".\07-aiv-outbreak-analysis.R"
 python ".\08-analysis-visualization-cli.py" --csv-date 20260811
 ```
@@ -321,8 +359,8 @@ Adjustable settings:
 
 Outputs:
 
-- ERA5-Land CSV files under `gee_data/era5_2016_2022/`.
-- Expected file pattern: `{year}_median_combined_result.csv`.
+- ERA5-Land CSV files under `your path/eu-aiv-analysis/gee_data/era5_2016_2022/`.
+- Expected file pattern: `your path/eu-aiv-analysis/gee_data/era5_2016_2022/{year}_median_combined_result.csv`.
 - These outputs are already included in `gee_data.zip`.
 
 Model used:
@@ -354,8 +392,8 @@ Adjustable settings:
 
 Outputs:
 
-- Raw or processed land-cover CSV files under `gee_data/`.
-- If missing values remain, use `03-run_land_cover_imputation.R` to create the final `gee_data/land_cover_2016_2022.csv`.
+- Raw or processed land-cover CSV files under `your path/eu-aiv-analysis/gee_data/`.
+- If missing values remain, use `03-run_land_cover_imputation.R` to create the final `your path/eu-aiv-analysis/gee_data/land_cover_2016_2022.csv`.
 - These outputs are already included in `gee_data.zip`.
 
 Model used:
@@ -393,11 +431,11 @@ Adjustable parameters:
 
 Outputs:
 
-- `land_cover_imputation/sampling_data/`: validation samples.
-- `land_cover_imputation/ml_prediction_output/`: model prediction outputs.
-- `land_cover_imputation/two_method_performance/`: RMSE / MAE comparison tables.
-- `land_cover_imputation/final_output/`: final imputed land-cover CSVs.
-- The final processed land-cover table used later is provided in `gee_data.zip` as `gee_data/land_cover_2016_2022.csv`.
+- `your path/eu-aiv-analysis/land_cover_imputation/sampling_data/`: validation samples.
+- `your path/eu-aiv-analysis/land_cover_imputation/ml_prediction_output/`: model prediction outputs.
+- `your path/eu-aiv-analysis/land_cover_imputation/two_method_performance/`: RMSE / MAE comparison tables.
+- `your path/eu-aiv-analysis/land_cover_imputation/final_output/`: final imputed land-cover CSVs.
+- The final processed land-cover table used later is provided in `gee_data.zip` as `your path/eu-aiv-analysis/gee_data/land_cover_2016_2022.csv`.
 
 Model used:
 
@@ -407,6 +445,7 @@ Model used:
 Example:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 Rscript ".\03-run_land_cover_imputation.R" --mode all --seed-start 123 --seed-end 124 --n-cores 2 --land-cover-types water
 ```
 
@@ -446,11 +485,11 @@ Important code settings that can be edited inside the script:
 
 Outputs:
 
-- `gpboost_abundance_outputs/{species}/{species}_reconstruction_abundance.csv`
-- `gpboost_abundance_outputs/{species}/{species}_feature_importance_gain.csv`
-- `gpboost_abundance_outputs/{species}/{species}_model_performance.csv`
-- `gpboost_abundance_outputs/{species}/{species}_random_effect.csv`
-- `gpboost_abundance_outputs/{species}/{species}_random_effect_cov_pars.csv`
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/{species}_reconstruction_abundance.csv`
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/{species}_feature_importance_gain.csv`
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/{species}_model_performance.csv`
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/{species}_random_effect.csv`
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/{species}_random_effect_cov_pars.csv`
 
 Model used:
 
@@ -461,6 +500,7 @@ Model used:
 Example:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 python ".\05-gpboost-cli.py" --birds "Anas crecca" --path-folder "." --output-folder "."
 ```
 
@@ -495,11 +535,11 @@ Adjustable parameters:
 
 Outputs:
 
-- `all-birds-abd/{species}.csv`: simplified abundance table for each species.
-- `gpboost_abundance_outputs/{species}/plot_python/*.png`: abundance maps for three seasonal periods.
-- `plot/FI_radar.png`: land-cover feature-importance radar plot.
-- `plot/SRC_scatter.png`: model-performance scatter plot.
-- `table/checklist_and_model_info.csv`: checklist and model summary table.
+- `your path/eu-aiv-analysis/all-birds-abd/{species}.csv`: simplified abundance table for each species.
+- `your path/eu-aiv-analysis/gpboost_abundance_outputs/{species}/plot_python/*.png`: abundance maps for three seasonal periods.
+- `your path/eu-aiv-analysis/plot/FI_radar.png`: land-cover feature-importance radar plot.
+- `your path/eu-aiv-analysis/plot/SRC_scatter.png`: model-performance scatter plot.
+- `your path/eu-aiv-analysis/table/checklist_and_model_info.csv`: checklist and model summary table.
 
 Model used:
 
@@ -509,6 +549,7 @@ Model used:
 Example:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 python ".\06-model-visualization-cli.py" --bird-folder-path ".\gpboost_abundance_outputs" --main-folder "."
 ```
 
@@ -558,9 +599,15 @@ Adjustable code settings:
 
 Outputs:
 
-- AIV result CSV files in the configured `aiv_analysis` output folder.
-- Weighted abundance maps in the configured weighted-abundance output folder.
-- Overview maps for poultry density and outbreak distribution.
+- `your path/eu-aiv-analysis/aiv_analysis/{outbreak_type}_all_birds_all_stages_stage_{write_csv_date}.csv`
+- `your path/eu-aiv-analysis/aiv_analysis/{outbreak_type}_all_birds_all_stages_density_{write_csv_date}.csv`
+- `your path/eu-aiv-analysis/aiv_analysis/{outbreak_type}_all_birds_all_stages_stageabundance_{write_csv_date}.csv`
+- `your path/eu-aiv-analysis/aiv_analysis/{outbreak_type}_all_birds_single_stage_abundance_{write_csv_date}.csv`
+- `your path/eu-aiv-analysis/aiv_analysis/{outbreak_type}_all_birds_single_stage_density_{write_csv_date}.csv`
+- `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage1_plot.png`
+- `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage2_plot.png`
+- `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage3_plot.png`
+- Overview map paths are controlled by the variables near the top of `07-aiv-outbreak-analysis.R`, such as `chicken_density_output_path`, `duck_density_output_path`, `domestic_outbreak_output_path`, and `wild_outbreak_output_path`.
 
 Model used:
 
@@ -570,6 +617,7 @@ Model used:
 Example:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 Rscript ".\07-aiv-outbreak-analysis.R"
 ```
 
@@ -608,10 +656,10 @@ Adjustable parameters:
 
 Outputs:
 
-- `table/abundance_positive_signi_info.csv`
-- `plot/Wild_abundance_effect_hist.png`
-- `plot/Domestic_abundance_effect_hist.png`
-- `plot/Domestic_Livestock_effect_scatter.png`
+- `your path/eu-aiv-analysis/table/abundance_positive_signi_info.csv`
+- `your path/eu-aiv-analysis/plot/Wild_abundance_effect_hist.png`
+- `your path/eu-aiv-analysis/plot/Domestic_abundance_effect_hist.png`
+- `your path/eu-aiv-analysis/plot/Domestic_Livestock_effect_scatter.png`
 
 Model used:
 
@@ -621,6 +669,7 @@ Model used:
 Example:
 
 ```powershell
+cd "your path/eu-aiv-analysis"
 python ".\08-analysis-visualization-cli.py" --csv-date 20260811 --main-folder "."
 ```
 
