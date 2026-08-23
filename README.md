@@ -6,10 +6,9 @@
 
 ## Project Summary
 
-This research project uses machine learning to predict the spatiotemporal relative abundance of 67 high-risk avian influenza carrier bird species across parts of Europe from 2021 to 2022. The final prediction outputs are visualized through an interactive Python Plotly dashboard. Users can select different bird species to compare average relative abundance across spatial units and examine monthly trend curves within individual spatial units.
+This research project uses machine learning to reconstruct the spatiotemporal relative abundance of 67 high-risk avian influenza carrier bird species across parts of Europe from 2021 to 2022. The reconstructed abundance outputs are visualized through model-result maps and summary figures. Users can compare average relative abundance across spatial units and examine monthly trend patterns for individual grid cells.
 
-The overall results reproduce broad migratory bird movement patterns, with birds moving southward in winter for overwintering and northward in summer. The modeling workflow also corrects for observer bias and uses environmental variables to drive abundance predictions. Subsequent analyses combine known avian influenza outbreak records with generalized additive models to evaluate seasonal risk, showing that many bird species, especially waterbirds, have significantly higher risk during the winter and spring outbreak peaks.
-
+The overall results reproduce broad migratory bird movement patterns, with birds moving southward in winter for overwintering and northward in summer. The modeling workflow accounts for observer bias and uses environmental variables to reconstruct monthly grid-level abundance patterns. Subsequent analyses combine known avian influenza outbreak records with generalized additive models to evaluate seasonal risk, showing that many bird species, especially waterbirds, have significantly higher risk during the winter and spring outbreak peaks.
 ![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
 
 ## 資料來源
@@ -82,7 +81,7 @@ The overall results reproduce broad migratory bird movement patterns, with birds
       
     - 本研究將不同來源、不同時間尺度與空間尺度的資料，統一整理成「月份 × 100 公里 × 100 公里網格」的分析資料表。
     - eBird 鳥類觀測紀錄依照觀測日期與座標，對應到特定月份與網格。
-    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，分別透過 Python 腳本[ERA5-Land Climate Data Download](#1-era5-land-climate-data-download) 與 [Dynamic World Land-cover Data Download](#2-dynamic-world-land-cover-data-download)下載，並計算 Google Earth Engine 所提供之各月份、各網格內的環境統計量。
+    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，分別透過 Python 腳本下載並計算 Google Earth Engine 所提供之各月份、各網格內的環境統計量。
     - FAO 家禽養殖密度資料與 FAO EMPRES-i 禽流感通報紀錄，依空間位置配對至相同網格，並依月份彙整。
     - 整合後的資料表以每一列代表一個「月份 × 網格」單位，作為後續土地覆蓋補值、鳥類相對豐度建模與禽流感風險分析的基礎。
         ↓
@@ -295,7 +294,7 @@ python ".\05-gpboost-cli.py" --birds all
 python ".\06-model-visualization-cli.py"
 ```
 
-Run `07-aiv-outbreak-analysis.R` after checking and editing the hard-coded input and output paths inside the script. Then use the same `write_csv_date` value in `08-analysis-visualization-cli.py`:
+Run `07-aiv-outbreak-analysis.R` after checking and editing `main_input_folder`, `birdname_folder_path`, `main_output_folder`, `outbreak_type`, and `write_csv_date` near the top of the script[6. AIV Outbreak Association Analysis](#6-aiv-outbreak-association-analysis). Then use the same `write_csv_date` value in `08-analysis-visualization-cli.py`:
 
 ```powershell
 cd "your path/eu-aiv-analysis"
@@ -315,10 +314,6 @@ Inputs:
 - European 100 km grid shapefile.
 - Study years and month range configured inside the notebook.
 
-Default input path if placed with the notebook:
-
-- `your path/eu-aiv-analysis/EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: 100 km grid used to summarize ERA5-Land climate values by grid cell.
-
 Adjustable settings:
 
 - Study years and months.
@@ -326,15 +321,9 @@ Adjustable settings:
 - Google Drive / local output location.
 - Grid or region shapefile path.
 
-Outputs:
+Note:
 
-- ERA5-Land CSV files under `your path/eu-aiv-analysis/gee_data/era5_2016_2022/`.
-- Expected file pattern: `your path/eu-aiv-analysis/gee_data/era5_2016_2022/{year}_median_combined_result.csv`.
-- These outputs are already included in `gee_data.zip`.
-
-Model used:
-
-- No statistical model is trained here. This step extracts and summarizes climate covariates from Google Earth Engine.
+- After downloading, the ERA5-Land outputs still require additional data cleaning and merging before they can be used by the modeling scripts. The cleaning / merging scripts are not included in this repository, but the cleaned and merged data are provided in the Google Drive `gee_data.zip`.
 
 ## 2. Dynamic World Land-cover Data Download
 
@@ -348,10 +337,6 @@ Inputs:
 - European 100 km grid shapefile.
 - Study years and months configured inside the notebook.
 
-Default input path if placed with the notebook:
-
-- `your path/eu-aiv-analysis/EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`: 100 km grid used to summarize Dynamic World land-cover probabilities by grid cell.
-
 Adjustable settings:
 
 - Study years and months.
@@ -359,31 +344,15 @@ Adjustable settings:
 - Google Drive / local output location.
 - Grid or region shapefile path.
 
-Outputs:
+Note:
 
-- Raw or processed land-cover CSV files under `your path/eu-aiv-analysis/gee_data/`.
-- If missing values remain, use `03-run_land_cover_imputation.R` to create the final `your path/eu-aiv-analysis/gee_data/land_cover_2016_2022.csv`.
-- These outputs are already included in `gee_data.zip`.
-
-Model used:
-
-- No statistical model is trained in the download notebook. It prepares land-cover covariates for later modeling.
+- After downloading, the Dynamic World outputs still require additional data cleaning and merging before they can be used by the modeling scripts. The cleaning / merging scripts are not included in this repository, but the cleaned and merged data are provided in the Google Drive `gee_data.zip`.
 
 ## 3. Land-cover Imputation
 
 Script: `03-run_land_cover_imputation.R`
 
 This optional CLI script fills missing Dynamic World land-cover values. It uses climate variables and coordinates to predict missing land-cover proportions, compares imputation performance, and writes final imputed land-cover tables.
-
-Can it run independently?
-
-- Yes. It does not require the abundance model outputs.
-- It does require the GEE land-cover / climate CSV and the EU grid shapefile.
-
-Inputs:
-
-- `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`
-- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
 
 Default input paths if the data folders are placed with the script:
 
@@ -415,21 +384,14 @@ Example:
 
 ```powershell
 cd "your path/eu-aiv-analysis"
-Rscript ".\03-run_land_cover_imputation.R" --mode all --seed-start 123 --seed-end 124 --n-cores 2 --land-cover-types water
+Rscript ".\03-run_land_cover_imputation.R" --mode all --seed-start 123 --seed-end 223 --n-cores 2 --land-cover-types water
 ```
 
 ## 4. GPBoost Abundance Modeling
 
 Script: `05-gpboost-cli.py`
 
-This CLI script trains bird relative-abundance models. It combines eBird checklist records with ERA5-Land climate data, Dynamic World land-cover data, geographic grid information, observation effort variables, and observer IDs. For each selected species, it predicts monthly grid-level relative abundance for 2021 and 2022.
-
-Inputs:
-
-- `ebird_filtered_checklist/`: filtered eBird checklist CSVs.
-- `gee_data/land_cover_2016_2022.csv`: processed land-cover table.
-- `gee_data/era5_2016_2022/2021_median_combined_result.csv`
-- `gee_data/era5_2016_2022/2022_median_combined_result.csv`
+This CLI script fits bird relative-abundance models. It combines eBird checklist records with ERA5-Land climate data, Dynamic World land-cover data, geographic grid information, observation effort variables, and observer IDs. For each selected species, it reconstructs monthly grid-level relative abundance for 2021 and 2022 by holding the observer random effect at a common reference level, making abundance values comparable across months and grid cells.
 
 Default input paths if the data folders are placed with the script:
 
@@ -464,13 +426,13 @@ Model used:
 
 - GPBoost model with a negative-binomial likelihood.
 - Observer ID is modeled as a grouped random effect to reduce observer-bias effects.
-- Model performance is summarized with Spearman Rank Correlation and MAE.
+- Model performance is summarized with Spearman Rank Correlation.
 
 Example:
 
 ```powershell
 cd "your path/eu-aiv-analysis"
-python ".\05-gpboost-cli.py" --birds "Anas crecca" --path-folder "." --output-folder "."
+python ".\05-gpboost-cli.py" --birds "all" --path-folder "." --output-folder "."
 ```
 
 ## 5. Abundance Output Visualization and Summary
@@ -478,15 +440,6 @@ python ".\05-gpboost-cli.py" --birds "Anas crecca" --path-folder "." --output-fo
 Script: `06-model-visualization-cli.py`
 
 This CLI script reads GPBoost abundance outputs, exports simplified abundance tables, creates species maps, summarizes land-cover feature importance, and plots model performance.
-
-Inputs:
-
-- `gpboost_abundance_outputs/`: output folder from `05-gpboost-cli.py`.
-- `gee_data/land_cover_2016_2022.csv`
-- `gee_data/era5_2016_2022/`
-- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
-- `bird_type_lookup.csv`
-- `ebird_filtered_checklist/`
 
 Default input paths if the data folders are placed with the script:
 
@@ -510,11 +463,6 @@ Outputs:
 - `your path/eu-aiv-analysis/plot/SRC_scatter.png`: model-performance scatter plot.
 - `your path/eu-aiv-analysis/table/checklist_and_model_info.csv`: checklist and model summary table.
 
-Model used:
-
-- No new model is trained here.
-- The script summarizes outputs from the GPBoost abundance models and uses feature-importance rankings.
-
 Example:
 
 ```powershell
@@ -522,13 +470,13 @@ cd "your path/eu-aiv-analysis"
 python ".\06-model-visualization-cli.py" --bird-folder-path ".\gpboost_abundance_outputs" --main-folder "."
 ```
 
-### Example Validation SRC Performance
+### Example Model SRC Performance
 
-![Validation SRC Performance example](docs/Validation_SRC_Performance_example.png)
+![Model SRC Performance example](docs/gpboost-src.png)
 
 ### Example Land Cover Feature Importance Radar Chart
 
-![Land Cover Feature Importance Radar Chart example](docs/Land_Cover_FI_Radar_Chart_example.png)
+![Land Cover Feature Importance Radar Chart example](docs/lc-fi.png)
 
 ## 6. AIV Outbreak Association Analysis
 
@@ -539,18 +487,37 @@ This R script links predicted bird abundance with avian influenza outbreak recor
 Important note:
 
 - This script is currently not a CLI script. Input and output paths are set directly near the top of the file.
-- Before running it, edit paths such as `EU_shp_path`, `chicken_density_path`, `duck_density_path`, `EU_aiv_2021_path`, `EU_aiv_2022_path`, `birdname_folder_path`, `write_csv_date`, and output folders.
-- `outbreak_type` is also set inside the script as `Domestic` or `Wild`.
+- Before running it, edit the folder settings near the top of `07-aiv-outbreak-analysis.R`: `main_input_folder`, `birdname_folder_path`, `main_output_folder`, `outbreak_type`, and `write_csv_date`.
+- `write_csv_date` is the date tag used in output CSV filenames. Use the same value later as `--csv-date` when running `08-analysis-visualization-cli.py`.
 
-Inputs:
+Before running this script, open `07-aiv-outbreak-analysis.R` and edit this block near the top of the file:
 
-- `all-birds-abd/`: simplified abundance CSVs from `06-model-visualization-cli.py`.
-- `aiv_fixed_data/EU aiv fixed data 2021.csv`
-- `aiv_fixed_data/EU aiv fixed data 2022.csv`
-- `livestock_density_10km/`: chicken and duck density CSVs.
-- `EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp`
+```r
+main_input_folder <- "your path/eu-aiv-analysis/"
+birdname_folder_path <- "your path/eu-aiv-analysis/all-birds-abd"
+main_output_folder <- "your path/eu-aiv-analysis/"
+outbreak_type <- "Wild" # Domestic, Wild
+write_csv_date <- "20260822"
+```
 
-Default input paths if the data folders are placed with the script:
+These settings are used to build the input and output paths below:
+
+```r
+# 2-1. Input path
+EU_shp_path <- paste0(main_input_folder, "EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp")
+chicken_density_path <- paste0(main_input_folder, "livestock_density_10km/chicken_livestock_density_10km.csv")
+duck_density_path <- paste0(main_input_folder, "livestock_density_10km/duck_livestock_density_2015_10km.csv")
+EU_aiv_2022_path <- paste0(main_input_folder, "aiv_fixed_data/EU aiv fixed data 2022.csv")
+EU_aiv_2021_path <- paste0(main_input_folder, "aiv_fixed_data/EU aiv fixed data 2021.csv")
+
+# 2-2. Output path
+aiv_analysis_output_folder <- paste0(main_output_folder, "aiv_analysis/")
+weighted_abundance_output_folder <- paste0(main_output_folder, "weighted_abundance/")
+```
+
+For example, if `write_csv_date <- "20260822"`, then `08-analysis-visualization-cli.py` should be run with `--csv-date 20260822`.
+
+input paths if the data folders are placed with the script:
 
 - `your path/eu-aiv-analysis/all-birds-abd/`: simplified monthly bird abundance tables created by `06-model-visualization-cli.py`.
 - `your path/eu-aiv-analysis/aiv_fixed_data/EU aiv fixed data 2021.csv`: cleaned 2021 AIV outbreak records.
@@ -576,7 +543,6 @@ Outputs:
 - `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage1_plot.png`
 - `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage2_plot.png`
 - `your path/eu-aiv-analysis/weighted_abundance/{outbreak_type}/{species}/stage3_plot.png`
-- Overview map paths are controlled by the variables near the top of `07-aiv-outbreak-analysis.R`, such as `chicken_density_output_path`, `duck_density_output_path`, `domestic_outbreak_output_path`, and `wild_outbreak_output_path`.
 
 Model used:
 
@@ -590,26 +556,15 @@ cd "your path/eu-aiv-analysis"
 Rscript ".\07-aiv-outbreak-analysis.R"
 ```
 
-### Example GAM Model Abundance Effect And P-value Bar Chart
+### Example Vanellus vanellus Weighted Abundance Distribution
 
-![GAM model abundance effect and p-value bar chart example](docs/abundance_effect_pvalue_plot.png)
-
-### Example Vanellus vanellus Stage 2 Weighted Abundance Distribution
-
-![Vanellus vanellus stage 2 weighted abundance distribution example](docs/stage2_plot.png)
+![Vanellus vanellus weighted abundance distribution example](docs/stage2_plot.png)
 
 ## 7. AIV Result Visualization
 
 Script: `08-analysis-visualization-cli.py`
 
 This CLI script summarizes AIV model output tables. It counts bird groups with positive and significant abundance effects, plots Wild and Domestic abundance-effect histograms, and visualizes chicken / duck livestock density effects.
-
-Inputs:
-
-- `bird_type_lookup.csv`
-- `aiv_analysis/Wild_all_birds_single_stage_abundance_{csv_date}.csv`
-- `aiv_analysis/Domestic_all_birds_single_stage_abundance_{csv_date}.csv`
-- `aiv_analysis/Domestic_all_birds_single_stage_density_{csv_date}.csv`
 
 Default input paths if the data folders are placed with the script:
 
@@ -630,17 +585,15 @@ Outputs:
 - `your path/eu-aiv-analysis/plot/Domestic_abundance_effect_hist.png`
 - `your path/eu-aiv-analysis/plot/Domestic_Livestock_effect_scatter.png`
 
-Model used:
-
-- No new model is trained here.
-- The script summarizes coefficient and p-value outputs from the AIV GAM analysis.
-
 Example:
 
 ```powershell
 cd "your path/eu-aiv-analysis"
 python ".\08-analysis-visualization-cli.py" --csv-date 20260811 --main-folder "."
 ```
+### Example GAM Model Abundance Effect And P-value Bar Chart
+
+![GAM model abundance effect and p-value bar chart example](docs/aiv-d-p2-abd.png)
 
 ## Troubleshooting
 
@@ -648,5 +601,5 @@ python ".\08-analysis-visualization-cli.py" --csv-date 20260811 --main-folder ".
 - If `05-gpboost-cli.py` cannot find a species, confirm that the scientific name matches the checklist filename in `ebird_filtered_checklist/`.
 - If `gpboost` cannot be imported, install it in the active Python environment with `python -m pip install gpboost`.
 - If geospatial files fail to load, confirm that all shapefile sidecar files are present, not only the `.shp` file.
-- If `07-aiv-outbreak-analysis.R` fails, first check the hard-coded paths near the top of the script.
+- If `07-aiv-outbreak-analysis.R` fails, first check `main_input_folder`, `birdname_folder_path`, `main_output_folder`, `outbreak_type`, and `write_csv_date` near the top of the script.
 - If `08-analysis-visualization-cli.py` cannot find CSV files, make sure `--csv-date` matches the date tag generated by `07-aiv-outbreak-analysis.R`.
