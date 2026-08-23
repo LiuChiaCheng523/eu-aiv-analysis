@@ -285,7 +285,6 @@ A small local test can start from one species:
 ```powershell
 cd "your path/eu-aiv-analysis"
 python ".\05-gpboost-cli.py" --birds "Anas crecca"
-python ".\06-model-visualization-cli.py"
 ```
 
 To run all checklist species:
@@ -542,29 +541,6 @@ Important note:
 - This script is currently not a CLI script. Input and output paths are set directly near the top of the file.
 - Before running it, edit paths such as `EU_shp_path`, `chicken_density_path`, `duck_density_path`, `EU_aiv_2021_path`, `EU_aiv_2022_path`, `birdname_folder_path`, `write_csv_date`, and output folders.
 - `outbreak_type` is also set inside the script as `Domestic` or `Wild`.
-
-Before running this script, open `07-aiv-outbreak-analysis.R` and edit the path settings near the top of the file:
-
-```r
-# 2-1. Input path
-EU_shp_path <- "your path/eu-aiv-analysis/EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp"
-chicken_density_path <- "your path/eu-aiv-analysis/livestock_density_10km/chicken_livestock_density_10km.csv"
-duck_density_path <- "your path/eu-aiv-analysis/livestock_density_10km/duck_livestock_density_2015_10km.csv"
-EU_aiv_2022_path <- "your path/eu-aiv-analysis/aiv_fixed_data/EU aiv fixed data 2022.csv"
-EU_aiv_2021_path <- "your path/eu-aiv-analysis/aiv_fixed_data/EU aiv fixed data 2021.csv"
-birdname_folder_path <- "your path/eu-aiv-analysis/all-birds-abd"
-
-# 2-2. Output path
-chicken_density_output_path <- "your path/eu-aiv-analysis/chicken_density.png"
-duck_density_output_path <- "your path/eu-aiv-analysis/duck_density.png"
-domestic_outbreak_output_path <- "your path/eu-aiv-analysis/Domestic_outbreak_map.png"
-wild_outbreak_output_path <- "your path/eu-aiv-analysis/Wild_outbreak_map.png"
-write_csv_date <- "20260811"
-aiv_analysis_output_folder <- "your path/eu-aiv-analysis/aiv_analysis/"
-weighted_abundance_output_folder <- "your path/eu-aiv-analysis/weighted_abundance/"
-```
-
-`write_csv_date` is located in the `# 2-2. Output path` section of `07-aiv-outbreak-analysis.R`. This value becomes part of the output CSV filenames. Use the same value when running `08-analysis-visualization-cli.py`, for example `--csv-date 20260811`.
 
 Inputs:
 
