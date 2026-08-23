@@ -1,15 +1,15 @@
 ## 專案摘要
 
-本研究專案透過機器學習預測 2021 年至 2022 年部分歐洲禽流感高風險帶原鳥種的時空相對豐度，共計 67 種。最終預測結果使用 Python Plotly 進行互動式可視化。使用者可點選不同鳥類名稱，比較不同空間單位的平均相對豐度，以及個別空間單位的月趨勢曲線變化。
+本研究專案利用機器學習，重建了 2021 年至 2022 年間歐洲部分地區 67 種高風險禽流感攜帶鳥類的時空相對豐度。重建的豐度結果透過模型輸出地圖和總結圖表進行視覺化展示；使用者既可以比較不同空間單元間的平均相對豐度，也能查看特定網格單元的月度變化趨勢。
 
-整體研究結果重現了候鳥遷徙模式：冬季往南遷移過冬，夏季往北遷移避暑。模型同時校正觀察者偏誤，並以環境因子驅動預測結果。後續分析結合已知禽流感爆發案例與廣義加性模型，驗證多種鳥類，尤其是水鳥，在疫情爆發高峰期的冬季與春季具有顯著較高的風險。
+整體結果可以了解部分候鳥遷徙的規律，即冬季南遷越冬、夏季北遷。此建模流程考慮了觀測偏差，並利用環境變數重建了網格尺度的每月豐度分佈。後續分析結合已知的禽流感疫情記錄與廣義加性模型（GAM）評估了季節性風險，結果顯示，許多鳥類（尤其是水鳥）在冬春兩季的疫情高發期面臨顯著更高的風險。
 
 ## Project Summary
 
 This research project uses machine learning to reconstruct the spatiotemporal relative abundance of 67 high-risk avian influenza carrier bird species across parts of Europe from 2021 to 2022. The reconstructed abundance outputs are visualized through model-result maps and summary figures. Users can compare average relative abundance across spatial units and examine monthly trend patterns for individual grid cells.
 
 The overall results reproduce broad migratory bird movement patterns, with birds moving southward in winter for overwintering and northward in summer. The modeling workflow accounts for observer bias and uses environmental variables to reconstruct monthly grid-level abundance patterns. Subsequent analyses combine known avian influenza outbreak records with generalized additive models to evaluate seasonal risk, showing that many bird species, especially waterbirds, have significantly higher risk during the winter and spring outbreak peaks.
-![Plotly Dashboard example](docs/Plotly_Dashboard_example.png)
+![Plotly Dashboard](docs/Plotly_Dashboard_example.png)
 
 ## 資料來源
 
@@ -294,7 +294,7 @@ python ".\05-gpboost-cli.py" --birds all
 python ".\06-model-visualization-cli.py"
 ```
 
-Run `07-aiv-outbreak-analysis.R` after checking and editing `main_input_folder`, `birdname_folder_path`, `main_output_folder`, `outbreak_type`, and `write_csv_date` near the top of the script[6. AIV Outbreak Association Analysis](#6-aiv-outbreak-association-analysis). Then use the same `write_csv_date` value in `08-analysis-visualization-cli.py`:
+Run `07-aiv-outbreak-analysis.R` after checking and editing `main_input_folder`, `birdname_folder_path`, `main_output_folder`, `outbreak_type`, and `write_csv_date` near the top of the script. see [6. AIV Outbreak Association Analysis](#6-aiv-outbreak-association-analysis). Then use the same `write_csv_date` value in `08-analysis-visualization-cli.py`:
 
 ```powershell
 cd "your path/eu-aiv-analysis"
@@ -470,13 +470,13 @@ cd "your path/eu-aiv-analysis"
 python ".\06-model-visualization-cli.py" --bird-folder-path ".\gpboost_abundance_outputs" --main-folder "."
 ```
 
-### Example Model SRC Performance
+### Model SRC Performance
 
-![Model SRC Performance example](docs/gpboost-src.png)
+![Model SRC Performance](docs/gpboost-src.png)
 
-### Example Land Cover Feature Importance Radar Chart
+### Land Cover Feature Importance Radar Chart
 
-![Land Cover Feature Importance Radar Chart example](docs/lc-fi.png)
+![Land Cover Feature Importance Radar Chart](docs/lc-fi.png)
 
 ## 6. AIV Outbreak Association Analysis
 
@@ -591,9 +591,9 @@ Example:
 cd "your path/eu-aiv-analysis"
 python ".\08-analysis-visualization-cli.py" --csv-date 20260811 --main-folder "."
 ```
-### Example GAM Model Abundance Effect And P-value Bar Chart
+### GAM Model Abundance Effect And P-value Bar Chart
 
-![GAM model abundance effect and p-value bar chart example](docs/aiv-d-p2-abd.png)
+![GAM model abundance effect and p-value bar chart](docs/aiv-d-p2-abd.png)
 
 ## Troubleshooting
 
