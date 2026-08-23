@@ -20,17 +20,17 @@ The overall results reproduce broad migratory bird movement patterns, with birds
    - Website: https://science.ebird.org/en/use-ebird-data/download-ebird-data-products
    - 作為鳥類觀測紀錄與相對豐度建模的主要資料來源。
    - 資料包含鳥種觀察紀錄、觀測時間、地理位置、觀察者資訊與觀測努力量等欄位。
-   - 本研究使用 2021 至 2022 年期間之 eBird 鳥類觀測資料進行模型訓練與預測。
+   - 本研究使用 2021 至 2022 年期間之 eBird 鳥類觀測資料進行模型擬合。
 
 2. **eBird Status and Trends**
    - Website: https://science.ebird.org/status-and-trends
-   - 用於驗證本研究所估計之鳥類相對豐度時空分布趨勢。
+   - 作為外部資料，可用於驗證本研究所估計之鳥類相對豐度時空分布趨勢。
    - 該資料提供鳥種在不同時間與空間下的相對豐度、出現機率與分布範圍等資訊。
 
 3. **FAO EMPRES-i**
    - Website: https://empres-i.apps.fao.org/
    - 作為禽流感疫情案例資料來源。
-   - 使用 2021 至 2022 年歐洲地區家禽與野鳥之禽流感通報紀錄，分析鳥類豐度與疫情爆發風險之關聯。
+   - 使用 2021 至 2022 年歐洲地區家禽與野鳥之禽流感通報紀錄，分析估計的鳥類豐度與疫情爆發風險之關聯。
 
 4. **FAO Livestock Systems**
    - Website: https://data.apps.fao.org/
@@ -45,18 +45,18 @@ The overall results reproduce broad migratory bird movement patterns, with birds
    - 本研究透過 Google Earth Engine 取得衛星遙測與氣候環境資料。
    - 使用 ERA5-Land Daily Aggregated 氣候資料，例如地表溫度、降雨量、風速與濕度等環境變數。
    - 使用 Dynamic World 土地覆蓋資料，取得水域、農地、森林、人造建地等土地覆蓋比例。
-   - 本研究使用 **Google Earth Engine Python API** 下載與處理遙測資料；使用前需先申請並啟用 GEE API。
+   - 本研究使用 **Python** 下載與處理遙測資料；使用前需先使用 Google 帳號申請 GEE 專案並啟用。
    - 下載資料時需準備對應研究範圍之 `.shp` 空間邊界檔，用於計算各網格內的多種遙測與氣候統計量。
 
 6. **European 100 km × 100 km grid**
    - QGIS: https://www.qgis.org/
    - 本研究以歐洲地區 100 公里 × 100 公里網格作為主要空間分析單位。
-   - 網格資料是利用 QGIS 對公開歐洲地圖 `.shp` 檔進行加工處理後建立，包括切割固定解析度網格、處理邊界區域、平滑化邊緣，以及降低 shapefile 檔案大小。
+   - 網格資料是利用 QGIS 對歐洲地圖 `.shp` 檔進行加工處理後建立，包括切割固定解析度網格、處理邊界區域、平滑化邊緣，以及降低 shapefile 檔案大小。
    - 所有鳥類觀測、環境因子、土地覆蓋、家禽密度與禽流感案例資料，皆依月份與網格進行時空配對。
 
 ## 研究方法架構
 
-本研究方法架構可分為五個主要階段：資料整合與前處理、土地覆蓋缺失值補值、鳥類相對豐度建模、禽流感風險分析，以及互動式視覺化。
+本研究方法架構可分為五個主要階段：資料整合與前處理、土地覆蓋缺失值補值、鳥類相對豐度建模、禽流感風險分析，以及模型結果視覺化。
 
 ```text
 1. Data Integration and Preprocessing
@@ -82,7 +82,7 @@ The overall results reproduce broad migratory bird movement patterns, with birds
       
     - 本研究將不同來源、不同時間尺度與空間尺度的資料，統一整理成「月份 × 100 公里 × 100 公里網格」的分析資料表。
     - eBird 鳥類觀測紀錄依照觀測日期與座標，對應到特定月份與網格。
-    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，透過 Google Earth Engine Python API 計算各月份、各網格內的環境統計量。
+    - ERA5-Land 氣候資料與 Dynamic World 土地覆蓋資料，分別透過 Python 腳本[ERA5-Land Climate Data Download](#1-era5-land-climate-data-download) 與 [Dynamic World Land-cover Data Download](#2-dynamic-world-land-cover-data-download)下載，並計算 Google Earth Engine 所提供之各月份、各網格內的環境統計量。
     - FAO 家禽養殖密度資料與 FAO EMPRES-i 禽流感通報紀錄，依空間位置配對至相同網格，並依月份彙整。
     - 整合後的資料表以每一列代表一個「月份 × 網格」單位，作為後續土地覆蓋補值、鳥類相對豐度建模與禽流感風險分析的基礎。
         ↓
@@ -106,21 +106,16 @@ The overall results reproduce broad migratory bird movement patterns, with birds
    ├── eBird checklist filtering
    │   eBird 觀測資料篩選
    │
-   ├── Observer bias correction using GLMM
-   │   使用 GLMM 校正觀察者偏誤
-   │
-   ├── Spatiotemporal sampling strategy
-   │   時空抽樣策略
-   │
-   ├── XGBoost Poisson model for each risk bird species
-   │   針對各風險鳥種建立 XGBoost Poisson 模型
-   │   - 模型特徵包含 59 種 ERA5-Land 氣候因子、9 種 Dynamic World 土地覆蓋因子、eBird 觀測努力量，以及觀察者偏誤校正指標等。
+   ├── GPBoost model for each risk bird species
+   │   針對各風險鳥種建立 GPBoost Negative Binomial 模型
+   │   - 模型特徵包含 59 種 ERA5-Land 氣候因子、9 種 Dynamic World 土地覆蓋因子、eBird 觀察者與觀測努力量等。
    │
    ├── Model evaluation using SRC
-   │   使用 SRC（Spearman Rank Correlation）評估模型預測表現
+   │   使用 SRC（Spearman Rank Correlation）評估模型表現
    │
    └── Monthly grid-level relative abundance prediction
-       產生月份 × 網格層級之相對豐度預測
+       重建月份 × 網格層級之相對豐度
+       - 將 observer random effect 與努力量標準化為相同參考水準，使不同月份與網格的相對豐度數值可相互比較。
         ↓
 
 4. Avian Influenza Risk Analysis
@@ -132,24 +127,27 @@ The overall results reproduce broad migratory bird movement patterns, with birds
    ├── Integration with poultry and wild bird outbreak records
    │   結合家禽與野鳥禽流感通報紀錄
    │
-   ├── Adjustment for chicken and duck density
-   │   控制雞與鴨養殖密度
+   ├── Adjustment for chicken and duck livestock density and geographic coordinates as covariates
+   │   將雞與鴨養殖密度及經緯度座標作為共變數進行校正
    │
    └── Generalized Additive Model analysis
        使用廣義加性模型分析疫情風險
         ↓
 
-5. Interactive Visualization
-   互動式視覺化
+5. Model Results Visualization
+   模型結果視覺化
    │
-   ├── Plotly Dash dashboard
-   │   Plotly Dash 儀表板
+   ├── Relative abundance maps and model performance plots
+   │   相對豐度地圖與模型表現圖
    │
-   ├── Species-level abundance map
-   │   鳥種層級相對豐度地圖
+   ├── Land-cover feature importance visualization
+   │   土地覆蓋變數重要性視覺化
    │
-   └── Monthly trend curve by spatial unit
-       個別空間單位月趨勢曲線
+   ├── AIV outbreak and weighted abundance maps
+   │   禽流感通報與加權相對豐度分布圖
+   │
+   └── GAM effect and poultry-density result plots
+       GAM 效應與家禽密度結果圖
 ```
 
 # Analysis workflow and scripts
@@ -161,12 +159,12 @@ The usual order is:
 1. Download climate data with `01-ERA5-download-colab.ipynb`.
 2. Download land-cover data with `02-DynamicWorld-download-colab.ipynb`.
 3. If needed, impute missing land-cover values with `03-run_land_cover_imputation.R`.
-4. Train bird relative-abundance models with `05-gpboost-cli.py`.
+4. Fitting of bird relative abundance models with `05-gpboost-cli.py`.
 5. Summarize and visualize model outputs with `06-model-visualization-cli.py`.
 6. Run AIV outbreak association analysis with `07-aiv-outbreak-analysis.R`.
 7. Summarize AIV model results with `08-analysis-visualization-cli.py`.
 
-`04-gpboost-val.py` is a Colab-derived GPBoost validation / batch experiment script. It contains hard-coded Google Drive paths and in-notebook commands, so it is mainly a reference or Colab workflow script rather than a local CLI entry point.
+`04-gpboost-val.py` is a Colab-derived GPBoost validation / batch experiment script.
 
 ## Scripts Download
 
@@ -188,6 +186,7 @@ Download and extract these zip files into the same project folder as the scripts
    - Contains Google Earth Engine outputs used by the later modeling steps.
    - Includes ERA5-Land climate tables from `01-ERA5-download-colab.ipynb`.
    - Includes Dynamic World land-cover tables from `02-DynamicWorld-download-colab.ipynb`.
+   - Includes land-cover imputation outputs from `03-run_land_cover_imputation.R`, which fills missing Dynamic World land-cover values.
    - Includes the processed / imputed `land_cover_2016_2022.csv` used by `05-gpboost-cli.py`, so users can start from step 05 without rerunning steps 01-03.
 2. `ebird_filtered_checklist.zip`
    - Contains species-level filtered eBird checklist CSV files used for GPBoost abundance modeling.
@@ -202,9 +201,9 @@ After downloading:
 
 1. Extract the zip files.
 2. Place the extracted folders under the project root.
-3. Keep the internal relative folder structure unchanged.
+3. Keep the internal relative folder structure unchanged, as shown in [Project Structure](#project-structure).
 
-In the default input examples below, `your path/eu-aiv-analysis/` means the full location of this project on your computer, for example `C:/Users/yourname/Python/eu-aiv-analysis/`.
+In the default input examples below, `your path/eu-aiv-analysis/` means the full location of this project on your computer, for example `C:/Users/yourname/eu-aiv-analysis/`.
 
 ## Project Structure
 
@@ -220,6 +219,8 @@ eu-aiv-analysis/
 ├─ 06-model-visualization-cli.py
 ├─ 07-aiv-outbreak-analysis.R
 ├─ 08-analysis-visualization-cli.py
+├─ install-r-packages.R
+├─ r-packages.txt
 ├─ bird_type_lookup.csv
 ├─ gee_data/
 │  ├─ era5_2016_2022/
@@ -229,27 +230,26 @@ eu-aiv-analysis/
 ├─ ebird_filtered_checklist/
 ├─ livestock_density_10km/
 ├─ aiv_fixed_data/
-├─ gpboost_abundance_outputs/
-├─ all-birds-abd/
-├─ aiv_analysis/
-├─ plot/
-└─ table/
+├─ land_cover_imputation/          # generated by 03-run_land_cover_imputation.R
+├─ gpboost_abundance_outputs/      # generated by 05-gpboost-cli.py
+├─ all-birds-abd/                  # generated by 06-model-visualization-cli.py
+├─ weighted_abundance/             # generated by 07-aiv-outbreak-analysis.R
+├─ aiv_analysis/                   # generated by 07-aiv-outbreak-analysis.R
+├─ plot/                           # generated by 06 or 08 visualization scripts
+└─ table/                          # generated by 06 or 08 visualization scripts
 ```
 
 Folder notes:
 
+- `install-r-packages.R`: R package installation script. It reads package names from `r-packages.txt`.
+- `bird_type_lookup.csv`: bird species lookup table used to label waterbird and non-waterbird groups for model-result summaries and visualizations.
 - `gee_data/`: Google Earth Engine outputs, including ERA5-Land climate tables and Dynamic World land-cover tables.
-- `gee_data/era5_2016_2022/`: monthly ERA5-Land climate summaries for each 100 km grid.
-- `gee_data/land_cover_2016_2022.csv`: processed Dynamic World land-cover table. This is the main reason the workflow can start from `05-gpboost-cli.py`.
-- `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`: intermediate GEE table with missing land-cover values, used only if rerunning imputation.
+- `gee_data/EU_2016_2022_land_cover_and_climate_data_containing_missing_values.csv`: GEE table with missing land-cover values, used only if rerunning imputation.
 - `EU_100km_fishnet_simple_by_distance/`: European 100 km by 100 km grid shapefile.
 - `ebird_filtered_checklist/`: species-level filtered eBird checklist CSV files.
 - `aiv_fixed_data/`: cleaned FAO EMPRES-i outbreak records for 2021 and 2022.
 - `livestock_density_10km/`: chicken and duck density tables used in the AIV association analysis.
-- `gpboost_abundance_outputs/`: abundance model outputs created by `05-gpboost-cli.py`.
-- `all-birds-abd/`: simplified abundance CSVs created by `06-model-visualization-cli.py` and used by the AIV analysis.
-- `aiv_analysis/`: AIV model result tables.
-- `plot/` and `table/`: summary figures and tables created by the visualization scripts.
+
 
 ## Recommended Environments
 
@@ -542,6 +542,29 @@ Important note:
 - This script is currently not a CLI script. Input and output paths are set directly near the top of the file.
 - Before running it, edit paths such as `EU_shp_path`, `chicken_density_path`, `duck_density_path`, `EU_aiv_2021_path`, `EU_aiv_2022_path`, `birdname_folder_path`, `write_csv_date`, and output folders.
 - `outbreak_type` is also set inside the script as `Domestic` or `Wild`.
+
+Before running this script, open `07-aiv-outbreak-analysis.R` and edit the path settings near the top of the file:
+
+```r
+# 2-1. Input path
+EU_shp_path <- "your path/eu-aiv-analysis/EU_100km_fishnet_simple_by_distance/EU_100km_fishnet_simple_by_distance.shp"
+chicken_density_path <- "your path/eu-aiv-analysis/livestock_density_10km/chicken_livestock_density_10km.csv"
+duck_density_path <- "your path/eu-aiv-analysis/livestock_density_10km/duck_livestock_density_2015_10km.csv"
+EU_aiv_2022_path <- "your path/eu-aiv-analysis/aiv_fixed_data/EU aiv fixed data 2022.csv"
+EU_aiv_2021_path <- "your path/eu-aiv-analysis/aiv_fixed_data/EU aiv fixed data 2021.csv"
+birdname_folder_path <- "your path/eu-aiv-analysis/all-birds-abd"
+
+# 2-2. Output path
+chicken_density_output_path <- "your path/eu-aiv-analysis/chicken_density.png"
+duck_density_output_path <- "your path/eu-aiv-analysis/duck_density.png"
+domestic_outbreak_output_path <- "your path/eu-aiv-analysis/Domestic_outbreak_map.png"
+wild_outbreak_output_path <- "your path/eu-aiv-analysis/Wild_outbreak_map.png"
+write_csv_date <- "20260811"
+aiv_analysis_output_folder <- "your path/eu-aiv-analysis/aiv_analysis/"
+weighted_abundance_output_folder <- "your path/eu-aiv-analysis/weighted_abundance/"
+```
+
+`write_csv_date` is located in the `# 2-2. Output path` section of `07-aiv-outbreak-analysis.R`. This value becomes part of the output CSV filenames. Use the same value when running `08-analysis-visualization-cli.py`, for example `--csv-date 20260811`.
 
 Inputs:
 
