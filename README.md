@@ -387,6 +387,10 @@ cd "your path/eu-aiv-analysis"
 Rscript ".\03-run_land_cover_imputation.R" --mode all --seed-start 123 --seed-end 223 --n-cores 2 --land-cover-types water
 ```
 
+### Comparison of Land Cover Imputation RMSE
+![Land Cover imputation rmse comparison](docs/lc-imputation-rmse.png)
+
+
 ## 4. GPBoost Abundance Modeling
 
 Script: `05-gpboost-cli.py`
